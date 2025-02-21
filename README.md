@@ -1,1 +1,0 @@
-Instead of teaching c++ features; I will try to approach it by giving solution for commong problems. After AI tools becoming common; finding these solutions is very easy now but I believe that talking about c++ language features beside the solution may help more. 

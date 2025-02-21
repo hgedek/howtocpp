@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>How-to - How-to C++</title>
+        <title>create tuple in multiple ways - How-to C++</title>
 
 
         <!-- Custom HTML head -->
@@ -152,14 +152,111 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="about"><a class="header" href="#about">About</a></h1>
+                        <h1 id="create-tuple-in-multiple-ways"><a class="header" href="#create-tuple-in-multiple-ways">create tuple in multiple ways</a></h1>
+<p>std::tuple is an amazing type which allows us to create unnamed structs. It's best to use as param or return type from functions when we need an anonymous compound type - supports templates which is best</p>
+<h2 id="using-constructors"><a class="header" href="#using-constructors">using constructors</a></h2>
+<pre><code class="language-c++">
+// variable
+std::tuple t{1,"hakan", 'x', 3.4f};
+
+// on the place creation of anonymous compound type: tuple - not named !
+auto create_tpl() -&gt; std::tuple&lt;int, float, char const *&gt; {
+    int i = 0;
+    float f = 0.3f;
+    const char *c = "hakan gedek";
+
+    return {i, f, c};
+}
+
+// template integration 
+template &lt;class ...Ts&gt;
+auto create_tpl(Ts...args) -&gt; std::tuple&lt;Ts...&gt;{
+    return {args...};
+}
+
+int main() {
+    auto t1 = create_tpl();
+    auto t2 = create_tpl(1,1.1f, "hakan");
+}
+
+</code></pre>
+<h2 id="using-make_tuple"><a class="header" href="#using-make_tuple">using make_tuple</a></h2>
+<p>std::make_tuple <code>creates copy</code> of the params and constructs the tuple. using std::ref and std::cref; we can store ref too. (std::reference_wrapper)...don't use &amp; in the tuple definition.</p>
+<pre><code class="language-c++">
+int main() {
+    int n = 0;
+
+    auto tpl = std::make_tuple(0, "hakan", std::ref(n));
+    auto&amp; m = std::get&lt;2&gt;(tpl);
+
+    m = 1;
+
+    assert(n == 1);
+}
+
+</code></pre>
+<h2 id="using-forward_as_tuple"><a class="header" href="#using-forward_as_tuple">using forward_as_tuple</a></h2>
+<p>std::forward_as_tuple <code>creates ref to originals</code> of the params so it's for passing params as ref. if you wish to create readonly variables keep const.</p>
+<pre><code class="language-c++">void print(const std::tuple&lt;int&amp;, int&amp;, const char*&gt;&amp; t) {
+    std::cout &lt;&lt; std::get&lt;0&gt;(t) &lt;&lt; ' ' &lt;&lt; std::get&lt;1&gt;(t) &lt;&lt; ' ' &lt;&lt; std::get&lt;2&gt;(t) &lt;&lt; std::endl;
+}
+
+// pass as T&amp; : mutable
+void foo(std::tuple&lt;int &amp;, float &amp;&gt; const &amp;t)
+{
+    auto &amp;i = std::get&lt;0&gt;(t);
+    auto &amp;f = std::get&lt;1&gt;(t);
+
+    i = 10;
+    f = 10.2f;
+}
+
+// pass as const T&amp;: immutable
+void bar(std::tuple&lt;int const &amp;, float const &amp;&gt; const &amp;t)
+{
+    // even without using const; we will still get const in auto so assignments will not work
+    const auto &amp;i = std::get&lt;0&gt;(t);
+    const auto &amp;f = std::get&lt;1&gt;(t);
+
+    // fails
+    // i = 10;
+    // f = 10.2f;
+}
+
+int main() {
+
+    int x = 1;
+    int y = 2;
+    char const* name = "hakan";
+
+    print(std::forward_as_tuple(x, y, name));
+
+    int i = 0;
+    float f = 0.0f;
+
+    foo(std::forward_as_tuple(i, f));
+
+    std::cout &lt;&lt; i &lt;&lt; ' ' &lt;&lt; f &lt;&lt; std::endl;
+}
+</code></pre>
+<h2 id="using-stdtie"><a class="header" href="#using-stdtie">using std::tie</a></h2>
+<p>can destruct but also can construct - valid for both solutions</p>
+<pre><code class="language-c++">
+</code></pre>
+<h2 id="using-stdtuple_cat"><a class="header" href="#using-stdtuple_cat">using std::tuple_cat</a></h2>
+<p>concats different tuples together</p>
+<pre><code class="language-c++">
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="decorator_with_lambda.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
-                            <a rel="next prefetch" href="decorator_with_lambda.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="capture_this_by_value.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -169,8 +266,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="decorator_with_lambda.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-                    <a rel="next prefetch" href="decorator_with_lambda.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="capture_this_by_value.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

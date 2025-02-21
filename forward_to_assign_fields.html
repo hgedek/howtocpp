@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>How-to - How-to C++</title>
+        <title>use std::forward to assign moved fields - How-to C++</title>
 
 
         <!-- Custom HTML head -->
@@ -152,16 +152,60 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="about"><a class="header" href="#about">About</a></h1>
+                        <h1 id="use-stdforward-to-assign-moved-fields"><a class="header" href="#use-stdforward-to-assign-moved-fields">use std::forward to assign moved fields</a></h1>
+<p>move semantics is topic of another snippet but here we will talk about using forward instead of move when assigning source to target</p>
+<p>voyage of the data:</p>
+<ul>
+<li>create a moved data ( T&amp;&amp; ) either creating a RValue or moving a LValue</li>
+<li>transfer it through operations by std::forward</li>
+<li>finish assignment with std::forward again instead std::move</li>
+</ul>
+<p>std::move creates T&amp;&amp; from T or T&amp;
+std::forward keeps inner type of T so if it's T&amp;&amp; then it's T&amp;&amp; when assigned and field(T&amp;&amp;) will trigger move_constructor (mvtor)</p>
+<pre><code class="language-c++">
+struct Manager {
+  private:
+    std::tuple&lt;int, float&gt; m_Data;
+
+    template &lt;class... Ts&gt;
+    constexpr Manager(Ts... args)
+        : m_Data(std::forward&lt;Ts&gt;(args)...) {} // assigned with forward
+
+  public:
+    template &lt;class... Ts&gt;
+        requires std::same_as&lt;std::tuple&lt;Ts...&gt;, decltype(m_Data)&gt;
+    static Manager create(Ts... args) {
+        static Manager inst{
+            std::forward&lt;Ts&gt;(args)...}; // pass it through here with forward
+        return inst;
+    }
+};
+
+int main() {
+    // directly using T&amp;&amp;
+    {
+        auto manager = Manager::create(1, 1.2f);
+    }
+
+    // T =&gt; T&amp;&amp;
+    {
+        int x = 0;
+        float y = .3f;
+
+        auto manager = Manager::create(std::move(x), std::move(y));
+    }
+}
+
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-
-                            <a rel="next prefetch" href="decorator_with_lambda.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
+                            <a rel="prev" href="static_local_variables.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
                             </a>
+
 
                         <div style="clear: both"></div>
                     </nav>
@@ -169,10 +213,10 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-
-                    <a rel="next prefetch" href="decorator_with_lambda.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
+                    <a rel="prev" href="static_local_variables.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
                     </a>
+
             </nav>
 
         </div>

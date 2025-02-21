@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>How-to - How-to C++</title>
+        <title>create decorators with lambda - How-to C++</title>
 
 
         <!-- Custom HTML head -->
@@ -152,14 +152,63 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="about"><a class="header" href="#about">About</a></h1>
+                        <h1 id="create-decorator-with-lambda"><a class="header" href="#create-decorator-with-lambda">create decorator with lambda</a></h1>
+<p>key feature of a lambda is capturing around. using this feature; we can create a creator / decorator easily.</p>
+<p>let create a printer...</p>
+<pre><code class="language-c++">
+void print(auto arg) { std::cout &lt;&lt; arg &lt;&lt; ' '; }
+void print(auto arg, auto... args) {
+    print(arg);
+    print(args...);
+}
+
+
+// decorating inner creator with outer params
+auto create_printer(auto...args) { // args: shared by inner creator
+    return [=](auto arg) {
+        print(args...); // 
+        print(arg);
+
+        std::cout &lt;&lt; '\n';
+    };
+}
+
+// 3 layered decorator... we can share first and second layers between inner typed objects
+auto create_more_printer(auto ...args) {
+    return [=](auto arg0) {
+        return [=](auto arg1) {
+            print(args...);
+            print(arg0);
+            print(arg1);
+
+            std::cout &lt;&lt; '\n';
+        };
+    };
+}
+
+int main() {
+    // first layer is fixed and captured by inner of decorator
+    auto printer = create_printer(1,2,3);
+
+    // we can use them with different args now
+    printer("hakan"); 
+    printer("gedek");
+}
+
+</code></pre>
+<blockquote>
+<p>when capturing I used by-value (=) because the captured args lifetimes maybe shorter than decorated instance. If by-ref(&amp;) was used then it would create an UB (undefined behaviour) so when capturing with lambda be careful with lifetimes of the args.</p>
+</blockquote>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="about.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
-                            <a rel="next prefetch" href="decorator_with_lambda.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="create_tuple_in_multiple_ways.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -169,8 +218,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="about.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-                    <a rel="next prefetch" href="decorator_with_lambda.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="create_tuple_in_multiple_ways.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

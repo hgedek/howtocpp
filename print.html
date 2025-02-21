@@ -154,7 +154,402 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="about"><a class="header" href="#about">About</a></h1>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="chapter-1"><a class="header" href="#chapter-1">Chapter 1</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="create-decorator-with-lambda"><a class="header" href="#create-decorator-with-lambda">create decorator with lambda</a></h1>
+<p>key feature of a lambda is capturing around. using this feature; we can create a creator / decorator easily.</p>
+<p>let create a printer...</p>
+<pre><code class="language-c++">
+void print(auto arg) { std::cout &lt;&lt; arg &lt;&lt; ' '; }
+void print(auto arg, auto... args) {
+    print(arg);
+    print(args...);
+}
+
+
+// decorating inner creator with outer params
+auto create_printer(auto...args) { // args: shared by inner creator
+    return [=](auto arg) {
+        print(args...); // 
+        print(arg);
+
+        std::cout &lt;&lt; '\n';
+    };
+}
+
+// 3 layered decorator... we can share first and second layers between inner typed objects
+auto create_more_printer(auto ...args) {
+    return [=](auto arg0) {
+        return [=](auto arg1) {
+            print(args...);
+            print(arg0);
+            print(arg1);
+
+            std::cout &lt;&lt; '\n';
+        };
+    };
+}
+
+int main() {
+    // first layer is fixed and captured by inner of decorator
+    auto printer = create_printer(1,2,3);
+
+    // we can use them with different args now
+    printer("hakan"); 
+    printer("gedek");
+}
+
+</code></pre>
+<blockquote>
+<p>when capturing I used by-value (=) because the captured args lifetimes maybe shorter than decorated instance. If by-ref(&amp;) was used then it would create an UB (undefined behaviour) so when capturing with lambda be careful with lifetimes of the args.</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="create-tuple-in-multiple-ways"><a class="header" href="#create-tuple-in-multiple-ways">create tuple in multiple ways</a></h1>
+<p>std::tuple is an amazing type which allows us to create unnamed structs. It's best to use as param or return type from functions when we need an anonymous compound type - supports templates which is best</p>
+<h2 id="using-constructors"><a class="header" href="#using-constructors">using constructors</a></h2>
+<pre><code class="language-c++">
+// variable
+std::tuple t{1,"hakan", 'x', 3.4f};
+
+// on the place creation of anonymous compound type: tuple - not named !
+auto create_tpl() -&gt; std::tuple&lt;int, float, char const *&gt; {
+    int i = 0;
+    float f = 0.3f;
+    const char *c = "hakan gedek";
+
+    return {i, f, c};
+}
+
+// template integration 
+template &lt;class ...Ts&gt;
+auto create_tpl(Ts...args) -&gt; std::tuple&lt;Ts...&gt;{
+    return {args...};
+}
+
+int main() {
+    auto t1 = create_tpl();
+    auto t2 = create_tpl(1,1.1f, "hakan");
+}
+
+</code></pre>
+<h2 id="using-make_tuple"><a class="header" href="#using-make_tuple">using make_tuple</a></h2>
+<p>std::make_tuple <code>creates copy</code> of the params and constructs the tuple. using std::ref and std::cref; we can store ref too. (std::reference_wrapper)...don't use &amp; in the tuple definition.</p>
+<pre><code class="language-c++">
+int main() {
+    int n = 0;
+
+    auto tpl = std::make_tuple(0, "hakan", std::ref(n));
+    auto&amp; m = std::get&lt;2&gt;(tpl);
+
+    m = 1;
+
+    assert(n == 1);
+}
+
+</code></pre>
+<h2 id="using-forward_as_tuple"><a class="header" href="#using-forward_as_tuple">using forward_as_tuple</a></h2>
+<p>std::forward_as_tuple <code>creates ref to originals</code> of the params so it's for passing params as ref. if you wish to create readonly variables keep const.</p>
+<pre><code class="language-c++">void print(const std::tuple&lt;int&amp;, int&amp;, const char*&gt;&amp; t) {
+    std::cout &lt;&lt; std::get&lt;0&gt;(t) &lt;&lt; ' ' &lt;&lt; std::get&lt;1&gt;(t) &lt;&lt; ' ' &lt;&lt; std::get&lt;2&gt;(t) &lt;&lt; std::endl;
+}
+
+// pass as T&amp; : mutable
+void foo(std::tuple&lt;int &amp;, float &amp;&gt; const &amp;t)
+{
+    auto &amp;i = std::get&lt;0&gt;(t);
+    auto &amp;f = std::get&lt;1&gt;(t);
+
+    i = 10;
+    f = 10.2f;
+}
+
+// pass as const T&amp;: immutable
+void bar(std::tuple&lt;int const &amp;, float const &amp;&gt; const &amp;t)
+{
+    // even without using const; we will still get const in auto so assignments will not work
+    const auto &amp;i = std::get&lt;0&gt;(t);
+    const auto &amp;f = std::get&lt;1&gt;(t);
+
+    // fails
+    // i = 10;
+    // f = 10.2f;
+}
+
+int main() {
+
+    int x = 1;
+    int y = 2;
+    char const* name = "hakan";
+
+    print(std::forward_as_tuple(x, y, name));
+
+    int i = 0;
+    float f = 0.0f;
+
+    foo(std::forward_as_tuple(i, f));
+
+    std::cout &lt;&lt; i &lt;&lt; ' ' &lt;&lt; f &lt;&lt; std::endl;
+}
+</code></pre>
+<h2 id="using-stdtie"><a class="header" href="#using-stdtie">using std::tie</a></h2>
+<p>can destruct but also can construct - valid for both solutions</p>
+<pre><code class="language-c++">
+</code></pre>
+<h2 id="using-stdtuple_cat"><a class="header" href="#using-stdtuple_cat">using std::tuple_cat</a></h2>
+<p>concats different tuples together</p>
+<pre><code class="language-c++">
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="capture-this-pointer-by-value"><a class="header" href="#capture-this-pointer-by-value">capture this pointer by value</a></h1>
+<p>we can capture this as by-ref normally but when we need to create a copy from it ?</p>
+<pre><code class="language-c++">
+struct Type
+{
+    void by_ref() {
+        auto f = [this]{
+            std::cout &lt;&lt; m_Id &lt;&lt; std::endl; 
+        };
+        f();
+    }
+
+    void by_value() {
+        auto f = [*this]{
+            std::cout &lt;&lt; m_Id &lt;&lt; std::endl;
+        };
+        f();
+    }
+
+    void by_copy_value() {
+        auto f = [thisCopy = *this] {
+            std::cout &lt;&lt; thisCopy.m_Id &lt;&lt; std::endl;
+        };
+    }
+
+    int m_Id;
+};
+
+int main() {
+    Type t{101};
+    t.by_ref();
+    t.by_value();
+    t.by_copy_value();
+}
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="initialize-fields-with-functions"><a class="header" href="#initialize-fields-with-functions">initialize fields with functions</a></h1>
+<p>struct/class/union has an order of initialization of fields in the order of they are defined.</p>
+<ul>
+<li>we can initialize them like any other variables</li>
+<li>depending on decl of thme { static, constexpr } we can use better inits</li>
+<li>we can pass them to next init functions</li>
+</ul>
+<pre><code class="language-c++">
+auto getId() {
+    static int counter = 101;
+    return counter++;
+}
+
+auto getName(int id) { return std::format("Object: {}", id); }
+
+auto getFullName(std::string const &amp;name, uintptr_t addr) {
+    return std::format("{} {}", name, addr);
+}
+
+struct Object {
+    int id = getId();
+    std::string name = getName(id);
+    std::string fullName = getFullName(name, reinterpret_cast&lt;uintptr_t&gt;(this));
+};
+
+void print(Object const &amp;obj) {
+    std::cout &lt;&lt; std::format("Id: {} Name: {} FullName: {}", obj.id, obj.name,
+                             obj.fullName)
+              &lt;&lt; std::endl;
+}
+
+int main() 
+{
+    Object obs[] = {{}, {}, {}};
+    print(obs[0]);
+    print(obs[1]);
+    print(obs[2]);
+}
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="use-va_opt-and-va_args-together"><a class="header" href="#use-va_opt-and-va_args-together">use VA_OPT and VA_ARGS together</a></h1>
+<p>in c macros; <strong>VA_ARGS</strong> used to pass <code>...</code> to macro definition</p>
+<pre><code class="language-c++">#define FUNC(...) func(__VA_ARGS__)
+</code></pre>
+<p>if we need some optionals like <code>,</code> we can use <code>__VA_OPT__(,)</code> to place them</p>
+<blockquote>
+<p>If <strong>VA_OPT</strong> is not used, pack will not be expanded correctly</p>
+</blockquote>
+<pre><code class="language-c++">
+#define FUNC(X, ...) func(X, __VA_ARGS__)o
+
+FUNC(1,2,3) =&gt; func(1,2,3)
+FUNC(1) =&gt; failed
+
+#define FUNC(X, ...) func(X _VA_OPT__(,) __VA_ARGS__)
+
+FUNC(1,2,3) =&gt; func(1,2,3)
+FUNC(1) =&gt; func(1)
+
+</code></pre>
+<pre><code class="language-c++">#define PRINT(...) printf(__VA_ARGS__)
+
+#define LOG(format, ...) printf(format __VA_OPT__(, ) __VA_ARGS__)
+
+#define DEBUG_LOG(format, ...)                                                 \
+    printf("DEBUG: " format __VA_OPT__(, ) __VA_ARGS__)
+
+int main() {
+    PRINT("%s %s\n", "hakan", "gedek");
+    PRINT("%d %d\n", 1, 2);
+    PRINT("");
+
+    LOG("%s %s\n", "hakan", "gedek");
+    LOG("%d %d\n", 1, 2);
+    LOG("");
+
+    DEBUG_LOG("%s %s\n", "hakan", "gedek");
+    DEBUG_LOG("%d %d\n", 1, 2);
+    DEBUG_LOG("");
+}
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="define-singleton-pattern-in-multiple-ways"><a class="header" href="#define-singleton-pattern-in-multiple-ways">define singleton pattern in multiple ways</a></h1>
+<p>there are multiple ways to define singleton pattern in c++.</p>
+<blockquote>
+<p>local static variables are thread-safe.
+if you need; you can wrap creation with <code>lock_guard&lt;mutex&gt;</code> or you can use atomics</p>
+</blockquote>
+<pre><code class="language-c++">// using static - standard
+struct Manager {
+  private:
+    std::tuple&lt;int, float&gt; m_Data;
+
+    template &lt;class... Ts&gt;
+    constexpr Manager(Ts... args) : m_Data(std::forward&lt;Ts&gt;(args)...) {}
+
+  public:
+    template &lt;class... Ts&gt;
+        requires std::same_as&lt;std::tuple&lt;Ts...&gt;, decltype(m_Data)&gt;
+    static Manager create(Ts... args) {
+        static Manager inst{std::forward&lt;Ts&gt;(args)...};
+        return inst;
+    }
+};
+
+</code></pre>
+<pre><code class="language-c++">// using shared_ptr
+struct manager {
+    private:
+    std::tuple&lt;int, float&gt; m_Data;
+
+    template &lt;class...Ts&gt;
+    constexpr Manager(Ts...args): m_Data(std::forward&lt;Ts&gt;(args)...){}
+
+    public:
+
+    template &lt;class...Ts&gt;
+        requires std::same_as&lt;std::tuple&lt;Ts...&gt;, decltype(m_Data)&gt; 
+    static std::shared_ptr&lt;Manager&gt; create(Ts...args) {
+        static std::shared_ptr&lt;Manager&gt; inst{std::forward&lt;Ts&gt;(args)...};
+        return inst;
+    }
+};
+</code></pre>
+<blockquote>
+<p>If you want you can use define your instance as atomic too.</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="define-static-local-variables"><a class="header" href="#define-static-local-variables">define static local variables</a></h1>
+<p>static is tightly coupled with scope paradigm. it defines something native to target scope.</p>
+<h2 id="class-local"><a class="header" href="#class-local">class local</a></h2>
+<p>scope: class/struct</p>
+<p>it's shared by all class instance so it belongs to class</p>
+<pre><code class="language-c++">class MyClass {
+    static inline int counter = 0;
+};
+</code></pre>
+<h2 id="function-local"><a class="header" href="#function-local">function local</a></h2>
+<p>scope: function</p>
+<p>it's shared by all function users so it belongs to function</p>
+<pre><code class="language-c++">class MyClass {
+    void foo() {
+        static int counter = 0;
+    }
+};
+
+// or 
+// foo.cpp
+
+void foo() {
+    static int counter = 0;
+}
+
+</code></pre>
+<h2 id="module-local"><a class="header" href="#module-local">module local</a></h2>
+<p>scope: module (translation unit)</p>
+<p>it's shared by all module functions so it belongs to module - tu</p>
+<p>foo.cpp</p>
+<pre><code class="language-c++">
+static int counter = 0;
+
+void foo() {
+    counter++;
+}
+
+void bar() {
+    counter++;
+}
+
+</code></pre>
+<blockquote>
+<p>static has internal linkage so it's only visible in translation unit
+other translation units cannot access internal linkage symbols</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="use-stdforward-to-assign-moved-fields"><a class="header" href="#use-stdforward-to-assign-moved-fields">use std::forward to assign moved fields</a></h1>
+<p>move semantics is topic of another snippet but here we will talk about using forward instead of move when assigning source to target</p>
+<p>voyage of the data:</p>
+<ul>
+<li>create a moved data ( T&amp;&amp; ) either creating a RValue or moving a LValue</li>
+<li>transfer it through operations by std::forward</li>
+<li>finish assignment with std::forward again instead std::move</li>
+</ul>
+<p>std::move creates T&amp;&amp; from T or T&amp;
+std::forward keeps inner type of T so if it's T&amp;&amp; then it's T&amp;&amp; when assigned and field(T&amp;&amp;) will trigger move_constructor (mvtor)</p>
+<pre><code class="language-c++">
+struct Manager {
+  private:
+    std::tuple&lt;int, float&gt; m_Data;
+
+    template &lt;class... Ts&gt;
+    constexpr Manager(Ts... args)
+        : m_Data(std::forward&lt;Ts&gt;(args)...) {} // assigned with forward
+
+  public:
+    template &lt;class... Ts&gt;
+        requires std::same_as&lt;std::tuple&lt;Ts...&gt;, decltype(m_Data)&gt;
+    static Manager create(Ts... args) {
+        static Manager inst{
+            std::forward&lt;Ts&gt;(args)...}; // pass it through here with forward
+        return inst;
+    }
+};
+
+int main() {
+    // directly using T&amp;&amp;
+    {
+        auto manager = Manager::create(1, 1.2f);
+    }
+
+    // T =&gt; T&amp;&amp;
+    {
+        int x = 0;
+        float y = .3f;
+
+        auto manager = Manager::create(std::move(x), std::move(y));
+    }
+}
+
+</code></pre>
 
                     </main>
 

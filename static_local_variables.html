@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>How-to - How-to C++</title>
+        <title>define static local variables - How-to C++</title>
 
 
         <!-- Custom HTML head -->
@@ -152,14 +152,62 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="about"><a class="header" href="#about">About</a></h1>
+                        <h1 id="define-static-local-variables"><a class="header" href="#define-static-local-variables">define static local variables</a></h1>
+<p>static is tightly coupled with scope paradigm. it defines something native to target scope.</p>
+<h2 id="class-local"><a class="header" href="#class-local">class local</a></h2>
+<p>scope: class/struct</p>
+<p>it's shared by all class instance so it belongs to class</p>
+<pre><code class="language-c++">class MyClass {
+    static inline int counter = 0;
+};
+</code></pre>
+<h2 id="function-local"><a class="header" href="#function-local">function local</a></h2>
+<p>scope: function</p>
+<p>it's shared by all function users so it belongs to function</p>
+<pre><code class="language-c++">class MyClass {
+    void foo() {
+        static int counter = 0;
+    }
+};
+
+// or 
+// foo.cpp
+
+void foo() {
+    static int counter = 0;
+}
+
+</code></pre>
+<h2 id="module-local"><a class="header" href="#module-local">module local</a></h2>
+<p>scope: module (translation unit)</p>
+<p>it's shared by all module functions so it belongs to module - tu</p>
+<p>foo.cpp</p>
+<pre><code class="language-c++">
+static int counter = 0;
+
+void foo() {
+    counter++;
+}
+
+void bar() {
+    counter++;
+}
+
+</code></pre>
+<blockquote>
+<p>static has internal linkage so it's only visible in translation unit
+other translation units cannot access internal linkage symbols</p>
+</blockquote>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="singleton_pattern_in_multiple_ways.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
-                            <a rel="next prefetch" href="decorator_with_lambda.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="forward_to_assign_fields.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -169,8 +217,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="singleton_pattern_in_multiple_ways.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-                    <a rel="next prefetch" href="decorator_with_lambda.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="forward_to_assign_fields.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

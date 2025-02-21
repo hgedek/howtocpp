@@ -8,7 +8,7 @@ class MDBookSidebarScrollbox extends HTMLElement {
         super();
     }
     connectedCallback() {
-        this.innerHTML = '<ol class="chapter"><li class="chapter-item expanded affix "><a href="about.html">How-to</a></li><li class="chapter-item expanded affix "><a href="chapter_1.html">create hello-world</a></li></ol>';
+        this.innerHTML = '<ol class="chapter"><li class="chapter-item expanded affix "><a href="about.html">How-to</a></li><li class="chapter-item expanded affix "><a href="decorator_with_lambda.html">create decorators with lambda</a></li><li class="chapter-item expanded affix "><a href="create_tuple_in_multiple_ways.html">create tuple in multiple ways</a></li><li class="chapter-item expanded affix "><a href="capture_this_by_value.html">capture this pointer by value</a></li><li class="chapter-item expanded affix "><a href="init_fields_with_function_calls.html">initialize fields with functions</a></li><li class="chapter-item expanded affix "><a href="vopts_vargs_togeter.html">use VA_OPT and VA_ARGS together</a></li><li class="chapter-item expanded affix "><a href="singleton_pattern_in_multiple_ways.html">define singleton pattern in multiple ways</a></li><li class="chapter-item expanded affix "><a href="static_local_variables.html">define static local variables</a></li><li class="chapter-item expanded affix "><a href="forward_to_assign_fields.html">use std::forward to assign moved fields</a></li></ol>';
         // Set the current, active page, and reveal it if it's hidden
         let current_page = document.location.href.toString().split("#")[0];
         if (current_page.endsWith("/")) {

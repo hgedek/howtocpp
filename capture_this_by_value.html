@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>How-to - How-to C++</title>
+        <title>capture this pointer by value - How-to C++</title>
 
 
         <!-- Custom HTML head -->
@@ -152,14 +152,52 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="about"><a class="header" href="#about">About</a></h1>
+                        <h1 id="capture-this-pointer-by-value"><a class="header" href="#capture-this-pointer-by-value">capture this pointer by value</a></h1>
+<p>we can capture this as by-ref normally but when we need to create a copy from it ?</p>
+<pre><code class="language-c++">
+struct Type
+{
+    void by_ref() {
+        auto f = [this]{
+            std::cout &lt;&lt; m_Id &lt;&lt; std::endl; 
+        };
+        f();
+    }
+
+    void by_value() {
+        auto f = [*this]{
+            std::cout &lt;&lt; m_Id &lt;&lt; std::endl;
+        };
+        f();
+    }
+
+    void by_copy_value() {
+        auto f = [thisCopy = *this] {
+            std::cout &lt;&lt; thisCopy.m_Id &lt;&lt; std::endl;
+        };
+    }
+
+    int m_Id;
+};
+
+int main() {
+    Type t{101};
+    t.by_ref();
+    t.by_value();
+    t.by_copy_value();
+}
+
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="create_tuple_in_multiple_ways.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
-                            <a rel="next prefetch" href="decorator_with_lambda.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="init_fields_with_function_calls.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -169,8 +207,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="create_tuple_in_multiple_ways.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-                    <a rel="next prefetch" href="decorator_with_lambda.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="init_fields_with_function_calls.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

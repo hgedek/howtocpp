@@ -1,0 +1,525 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>use advanced template solutions - How-to C++</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">How-to C++</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="use-advanced-template-solutions"><a class="header" href="#use-advanced-template-solutions">use advanced template solutions</a></h1>
+<blockquote>
+<p>removing pointer from a type</p>
+</blockquote>
+<pre><code class="language-c++">template &lt;typename T, typename Stream = std::ostream&gt;
+struct is_streamable {
+private:
+    template &lt;typename U&gt;
+    static auto test(int) -&gt; decltype(std::declval&lt;Stream&gt;() &lt;&lt; std::declval&lt;U&gt;(), std::true_type);
+
+    template &lt;typename&gt;
+    static auto test(...) -&gt; std::false_type;
+public:
+    static constexpr auto value = decltype(test&lt;T&gt;(0))::value;
+};
+
+</code></pre>
+<blockquote>
+<p>checking if a type has a method with sfinae technique</p>
+</blockquote>
+<p>this is easily re-written with concepts</p>
+<pre><code class="language-c++">
+
+template &lt;typename T&gt;
+struct has_method {
+private:
+    template &lt;typename U&gt;
+    static auto test(int) -&gt; decltype(declval&lt;U&gt;().method(), std::true_type());
+
+    template &lt;typename&gt;
+    static auto test(...) -&gt; std::false_type;
+public:
+    static constexpr auto value = decltype(test&lt;T&gt;(0))::value;
+};
+
+// or
+
+template &lt;typename T, typename = void&gt;
+struct has_method: std::false_type{};
+
+template &lt;typename T&gt;
+struct has_method&lt;T, std::void_t&lt; decltype(std::declval&lt;T&gt;().method())&gt;&gt;: std::true_type{};
+
+</code></pre>
+<blockquote>
+<p>has common type</p>
+</blockquote>
+<pre><code class="language-c++">
+template &lt;typename T, typename U&gt;
+struct has_common_type {
+    static constexpr auto value =
+        std::is_same_v&lt;decltype(std::declval&lt;T&gt;() + std::declval&lt;U&gt;()), T&gt; ||
+        std::is_same_v&lt;decltype(std::declval&lt;T&gt;() + std::declval&lt;U&gt;()), U&gt;
+};
+</code></pre>
+<blockquote>
+<p>trailing return types</p>
+</blockquote>
+<pre><code class="language-c++">
+template &lt;typename T, typename U&gt;
+auto add(T t, U u) -&gt; decltype(std::declval&lt;T&gt;() + std::declval&lt;U&gt;()) {
+    return t + u;
+}
+
+</code></pre>
+<blockquote>
+<p>checking if a type iterable</p>
+</blockquote>
+<p>this is easily re-written with concepts</p>
+<pre><code class="language-c++">
+template &lt;typename T&gt;
+struct is_iterable {
+private:
+    template &lt;typename U&gt;
+    static auto test(int) -&gt; decltype(std::begin(std::declval&lt;T&amp;&gt;()) != std::end(std::declval&lt;T&amp;&gt;())), std::true_type());
+
+    template &lt;typename&gt;
+    static auto test(...) -&gt; std::false_type;
+public:
+    static constexpr bool value = decltype(test&lt;T&gt;(0))::value;
+};
+
+</code></pre>
+<blockquote>
+<p>compile time function composition</p>
+</blockquote>
+<pre><code class="language-c++">
+template &lt;typename F, typename G&gt;
+struct compose {
+private:
+    F f;
+    G g;
+
+public:
+    compose(F f, G g): f(f), g(g) {}
+
+    template &lt;typename...Args&gt;
+    auto operator()(Args&amp;&amp;...args) -&gt; decltype(f(g(std::forward&lt;Args&gt;(args)...))) {
+        return f(g(std::forward&lt;Args&gt;(args)...));
+    }
+}
+
+</code></pre>
+<blockquote>
+<p>detecting if a type is callable</p>
+</blockquote>
+<pre><code class="language-c++">
+template &lt;typename F, typename...Args&gt;
+struct is_callable {
+private:
+    template &lt;typename U&gt;
+    static auto test(int) -&gt; decltype(std::declval&lt;U&gt;()(std::declval&lt;Args&gt;()...), std::true_type());
+
+    template &lt;typename U&gt;
+    static auto test(...) -&gt; std::false_type;
+public:
+    static constexpr bool value = decltype(test&lt;T&gt;(0))::value;
+};
+
+</code></pre>
+<blockquote>
+<p>transform tuple: applying projection to each tuple value and creating a new tuple</p>
+</blockquote>
+<pre><code class="language-c++">
+template &lt;typename Tuple, typename F, size_t...Is&gt;
+auto transform_tuple_impl(Tuple&amp;&amp; t, F&amp;&amp; f, std::index_sequence&lt;Is...&gt;) {
+    return std::make_tuple(
+        f(std::get&lt;Is&gt;(std::forward&lt;Tuple&gt;(t))...
+    );
+}
+
+template &lt;typename Tuple, typename F&gt;
+auto transform_tuple(Tuple&amp;&amp; t, F&amp;&amp; f) {
+    constexpr size_t N = std::tuple_size_v&lt;std::remove_reference_t&lt;Tuple&gt;&gt;; // template typenames can hold references to support universal reference
+    return transform_tuple_impl(
+        std::forward&lt;Tuple&gt;(t),
+        std::forward&lt;F&gt;(f),
+        std::make_index_sequence&lt;N&gt;{}
+    );
+}
+
+
+// this is modern approach using std::apply
+template&lt;typename Tuple, typename Func&gt;
+constexpr auto transformTuple(Tuple&amp;&amp; tuple, Func&amp;&amp; func) {
+    return std::apply([&amp;func](auto&amp;&amp;... args) {
+        return std::make_tuple(func(std::forward&lt;decltype(args)&gt;(args))...);
+    }, std::forward&lt;Tuple&gt;(tuple));
+}
+
+</code></pre>
+<blockquote>
+<p>checking if type is addable</p>
+</blockquote>
+<p>again, concepts can solve this easily</p>
+<pre><code class="language-c++">
+template &lt;typename T, typename U&gt;
+struct has_addition {
+private:
+    template &lt;typename A, typename B&gt;
+    static auto test(int) -&gt; decltype(std::declval&lt;A&gt;() + std::declval&lt;B&gt;(), std::true_type());
+
+    template &lt;typename, typename&gt;
+    static auto test(...) -&gt; std::false_type;
+public:
+    static constexpr auto value = decltype(test&lt;T,U&gt;(0))::value;
+};
+</code></pre>
+<blockquote>
+<p>iterating over tuple types</p>
+</blockquote>
+<pre><code class="language-c++">
+template &lt;typename Tuple, size_t ...Is&gt;
+void print_tuple_types(std::index_sequence&lt;Is...&gt;) {
+    (std::cout &lt;&lt; ... &lt;&lt; typeid(std::tuple_element_t&lt;Is,Tuple&gt;).name() &lt;&lt; " " );
+}
+
+void foo() {
+    using tuple_t = std::tuple&lt;int,float, const char*&gt;;
+    print_tuple_types&lt;tuple_t&gt;(std::make_index_sequence&lt;std::tuple_size_v&lt;tuple_t&gt;&gt;{});
+}
+</code></pre>
+<blockquote>
+<p>serializer with sfinae guards</p>
+</blockquote>
+<pre><code class="language-c++">
+#include &lt;array&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;type_traits&gt;
+#include &lt;vector&gt;
+
+struct data {
+    int id;
+    std::array&lt;char, 20&gt; text;
+};
+
+template &lt;typename T&gt;
+class serializer {
+   public:
+    template &lt;typename U = T&gt;
+    typename std::enable_if_t&lt;std::is_trivially_copyable_v&lt;U&gt;,
+                              std::vector&lt;char&gt;&gt;
+    serialize() {
+        std::vector&lt;char&gt; buffer(
+            sizeof(T));  // create a continuous memory in heap
+        T* obj = reinterpret_cast&lt;T*&gt;(buffer.data());
+        *obj = value_;
+        return buffer;
+    }
+
+    template &lt;typename U = T&gt;
+    typename std::enable_if_t&lt;std::is_same_v&lt;U, std::string&gt;, std::vector&lt;char&gt;&gt;
+    serialize() {
+        return std::vector&lt;char&gt;{value_.begin(), value_.end()};
+    }
+
+    T value_;
+};
+
+int main() {
+    data d{.id = 101, .text = "hakan gedek"};
+    serializer&lt;data&gt; s(d);
+
+    auto res = s.serialize();
+
+    for (auto&amp; ch : res) std::cout &lt;&lt; ch;
+}
+
+</code></pre>
+<blockquote>
+<p>optimization for copying</p>
+</blockquote>
+<pre><code class="language-c++">
+// trivially stuff decides if a type has encapsulation or not - like POD , data classes etc..they don't implement encapsulation rules.
+
+template&lt;typename T&gt;
+class OptimizedWrapper {
+public:
+    // Optimize for trivially copyable types
+    template&lt;typename U = T&gt;
+    typename std::enable_if_t&lt;std::is_trivially_copyable_v&lt;U&gt;, void&gt;
+    store(const T&amp; value) {
+        // Potentially more efficient storage for trivially copyable types
+        memcpy(&amp;data, &amp;value, sizeof(T)); // raw data assignment
+    }
+
+    // Fallback for complex types
+    template&lt;typename U = T&gt;
+    typename std::enable_if_t&lt;!std::is_trivially_copyable_v&lt;U&gt;, void&gt;
+    store(const T&amp; value) {
+        data = value; // own copy assignment called - slower
+    }
+
+private:
+    T data;
+}
+</code></pre>
+<blockquote>
+<p>static buffer</p>
+</blockquote>
+<pre><code class="language-c++">template&lt;int Size&gt;
+class StaticBuffer {
+private:
+    std::array&lt;char, Size&gt; buffer;
+
+public:
+    constexpr StaticBuffer() : buffer{} {}
+
+    constexpr size_t size() const { return Size; }
+};
+
+</code></pre>
+<blockquote>
+<p>type based optimization</p>
+</blockquote>
+<pre><code class="language-c++">
+template&lt;typename T&gt;
+constexpr T processValue(T value) {
+    if constexpr (std::is_integral_v&lt;T&gt;) {
+        return value * 2;  // Optimize for integral types
+    } else if constexpr (std::is_floating_point_v&lt;T&gt;) {
+        return value / 2.0;  // Different optimization for floating-point
+    } else {
+        return value;  // Fallback for other types
+    }
+}
+
+</code></pre>
+<blockquote>
+<p>compile time sum</p>
+</blockquote>
+<pre><code class="language-c++">
+template&lt;int N&gt;
+struct CompileTimeSum {
+    static constexpr int value = N + CompileTimeSum&lt;N - 1&gt;::value;
+};
+
+template&lt;&gt;
+struct CompileTimeSum&lt;0&gt; {
+    static constexpr int value = 0;
+};
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="monadic_ops_with_optinal.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="using_decltype_and_declval.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="monadic_ops_with_optinal.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="using_decltype_and_declval.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

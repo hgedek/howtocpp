@@ -1,0 +1,1264 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>use ranges-lib constrained algorithms - How-to C++</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">How-to C++</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="use-ranges-lib-constrained-algorithms"><a class="header" href="#use-ranges-lib-constrained-algorithms">use ranges-lib constrained algorithms</a></h1>
+<p>these are called <code>constrained</code> algorithms - naming is same with old std::algorithms but concept is a little bit different.</p>
+<ul>
+<li>range can be iterator-sentinel pair</li>
+<li>range can be range based</li>
+</ul>
+<p>it supports sentinel, projection and pointer to members.</p>
+<p>popular ones...</p>
+<h2 id="all_of-any_of-none_of"><a class="header" href="#all_of-any_of-none_of">all_of, any_of, none_of</a></h2>
+<p>all elements or some of them or neither of them must be ok with a condition</p>
+<pre><code class="language-c++">
+#include &lt;algorithm&gt;
+#include &lt;iostream&gt;
+#include &lt;ranges&gt;
+#include &lt;vector&gt;
+
+int main() {
+    std::vector&lt;int&gt; vec = {2, 4, 6, 8};
+    bool all_even =
+        std::ranges::all_of(vec, [](auto&amp;&amp; n) { return n % 2 == 0; });
+    std::cout &lt;&lt; "All elements are even: " &lt;&lt; std::boolalpha &lt;&lt; all_even
+              &lt;&lt; std::endl;
+
+    bool any_even =
+        std::ranges::any_of(vec, [](auto&amp;&amp; n) { return n % 2 == 0; });
+    std::cout &lt;&lt; "Any element is even: " &lt;&lt; std::boolalpha &lt;&lt; any_even
+              &lt;&lt; std::endl;
+
+    bool none_even =
+        std::ranges::none_of(vec, [](auto&amp;&amp; n) { return n % 2 == 0; });
+    std::cout &lt;&lt; "No elements are even: " &lt;&lt; std::boolalpha &lt;&lt; none_even
+              &lt;&lt; std::endl;
+
+    return 0;
+
+
+</code></pre>
+<h2 id="count-count_if"><a class="header" href="#count-count_if">count, count_if</a></h2>
+<p>count or count if condition applies and return the count of element</p>
+<pre><code class="language-c++">
+#include &lt;algorithm&gt;
+#include &lt;iostream&gt;
+#include &lt;ranges&gt;
+#include &lt;vector&gt;
+
+int main() {
+    std::vector&lt;int&gt; vec = {1, 2, 3, 2, 4, 2};
+    auto count_twos = std::ranges::count(vec, 2);
+    std::cout &lt;&lt; "Number of twos: " &lt;&lt; count_twos &lt;&lt; std::endl;
+
+    auto count_even =
+        std::ranges::count_if(vec, [](auto&amp;&amp; n) { return n % 2 == 0; });
+    std::cout &lt;&lt; "Number of even elements: " &lt;&lt; count_even &lt;&lt; std::endl;
+
+    return 0;
+}
+
+</code></pre>
+<h2 id="replace-replace_if-replace_copy-replace_copy_if"><a class="header" href="#replace-replace_if-replace_copy-replace_copy_if">replace, replace_if, replace_copy, replace_copy_if</a></h2>
+<p>update the range's element with new one or after checking a condition. _copy ones will create a new range.</p>
+<pre><code class="language-c++">
+#include &lt;algorithm&gt;
+#include &lt;print&gt;
+#include &lt;ranges&gt;
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+struct MyS {
+    int value;
+    constexpr auto operator&lt;=&gt;(MyS const&amp;) const = default;
+    constexpr bool operator==(MyS const&amp;) const = default;
+};
+
+int main() {
+    {
+        std::vector&lt;MyS&gt; data = {{1}, {2}, {3}, {4}, {2}, {5}};
+
+        ranges::replace(data, MyS{2}, MyS{101});
+
+        for (auto&amp; item : data) std::print("{}, ", item.value);
+        std::println();
+    }
+
+    {
+        std::vector&lt;MyS&gt; data = {{1}, {2}, {3}, {4}, {2}, {5}};
+
+        ranges::replace_if(
+            data, [](MyS const&amp; ms) { return ms.value == 2; }, MyS{101});
+
+        for (auto&amp; item : data) std::print("{}, ", item.value);
+        std::println();
+    }
+
+    {
+        std::vector&lt;MyS&gt; data = {{1}, {2}, {3}, {4}, {2}, {5}};
+        std::vector&lt;MyS&gt; copy_data;
+
+        ranges::replace_copy_if(
+            data, std::back_inserter(copy_data),
+            [](MyS const&amp; ms) { return ms.value == 2; }, MyS{101});
+        for (auto&amp; item : data) std::print("{}, ", item.value);
+        std::println();
+        for (auto&amp; item : copy_data) std::print("{}, ", item.value);
+        std::println();
+    }
+
+    return 0;
+}
+
+</code></pre>
+<h2 id="mismatch"><a class="header" href="#mismatch">mismatch</a></h2>
+<p>find the first positions in each range that's a mismatch. returns a type with two iterator types that show the mismatch points in ranges.</p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;
+#include &lt;print&gt;
+#include &lt;ranges&gt;
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    {
+        std::vector v1 = {1, 2, 3, 5, 6};
+        std::vector v2 = {1, 2, 3, 4};
+
+        auto [it1, it2] = ranges::mismatch(v1, v2);
+        std::println("{} != {}", *it1, *it2);
+    }
+
+    {
+        std::vector v1 = {1, 2, 3};
+        std::vector v2 = {1};
+
+        auto [it1, it2] = ranges::mismatch(v1, v2);
+        std::println("{} != {}", *it1, *it2);
+    }
+    {
+        // crashes the program
+        // std::vector v1 = {1, 2, 3};
+        // std::vector&lt;int&gt; v2 = {};
+
+        // auto [it1, it2] = ranges::mismatch(v1, v2);
+        // std::println("{} != {}", *it1, *it2);
+    }
+    {
+        std::string name = "abba";
+        auto&amp;&amp; rev = name | views::reverse;
+
+        auto [it1, it2] = ranges::mismatch(name, rev);
+        if (it1 == name.end() &amp;&amp; it2 == rev.end()) std::println("same");
+    }
+}
+
+</code></pre>
+<h2 id="equal"><a class="header" href="#equal">equal</a></h2>
+<p>compare if both ranges are equal...many containers have already implemented <code>operator==</code> so they compare items which must have implemented them. so you can cmp: vector, array, string... but if your range doesn't have it you can use this.</p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;
+#include &lt;print&gt;
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+
+int main() {
+    std::vector v1 = {1, 2, 3};
+    std::vector v2 = {1, 2, 3};
+    std::vector v3 = {2, 3, 4};
+
+    std::println("{}", v1 == v2);
+
+    if (ranges::equal(v1, v2)) std::println("v1 == v2");
+
+    if (ranges::equal(v1, v3)) std::println("v1 == v3");
+}
+</code></pre>
+<h2 id="lexicographical_compare"><a class="header" href="#lexicographical_compare">lexicographical_compare</a></h2>
+<p>you can compare 2 ranges - vector, string, array...</p>
+<p>possible results:</p>
+<ul>
+<li>true: &lt;</li>
+<li>false: &gt;=</li>
+</ul>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;print&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+#include &lt;string&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    std::string s1 = "hakan";
+    std::string s2 = "hasan";
+    std::string s3 = "hakan";
+
+    auto res = ranges::lexicographical_compare(s1, s2);
+    if (res)
+        std::println("{} &lt; {}", s1, s2);
+    else
+        std::println("{} &gt;= {}", s1, s2);
+
+    res = ranges::lexicographical_compare(s1, s3);
+    if (res)
+        std::println("{} &lt; {}", s1, s3);
+    else
+        std::println("{} &gt;= {}", s1, s3);
+
+    return 0;
+}
+</code></pre>
+<h2 id="find-find_if-find_if_not"><a class="header" href="#find-find_if-find_if_not">find, find_if, find_if_not</a></h2>
+<p>find or find if condition applies or doesn't applies. find_if_not will return first item that doesn't support the given functor's condition.</p>
+<pre><code class="language-c++">
+#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;print&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+
+int main() {
+    std::vector&lt;int&gt; data = {1, 2, 3, 4, 5, 6};
+    {
+        if (auto it = ranges::find(data, 3); it != data.end())
+            std::println("{} exists", *it);
+    }
+    {
+        if (auto it = ranges::find_if(data, [](int x) { return x % 3 == 0; });
+            it != data.end()) {
+            std::println("{} % 3 == 0 exists", *it);
+        }
+    }
+    {
+        if (auto it =
+                ranges::find_if_not(data, [](int x) { return x % 3 == 0; });
+            it != data.end()) {
+            std::println("{} % 3 != 0 exists", *it);
+        }
+    }
+
+    return 0;
+}
+</code></pre>
+<h2 id="copy-copy_if"><a class="header" href="#copy-copy_if">copy, copy_if</a></h2>
+<p>copy or copy if condition applies. copy constructs are used if src type has it.</p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;cstring&gt;
+#include &lt;functional&gt;
+#include &lt;print&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+struct MyS {
+    MyS(std::string&amp;&amp; n) : data(std::move(n)) {}
+    MyS(const MyS&amp; other) : data(other.data) {
+        std::println("MyS const&amp; called");
+    }
+    MyS(MyS&amp;&amp; other) : data(std::move(other.data)) {
+        std::println("MyS&amp;&amp; called");
+    }
+    std::string data;
+};
+
+int main() {
+    std::vector&lt;MyS&gt; src;
+    src.emplace_back("hakan");
+    src.emplace_back("gedek");
+    src.emplace_back("swe");
+    std::println();
+
+    std::vector&lt;MyS&gt; dst;
+
+    ranges::copy(src, std::back_inserter(dst));
+    for (auto&amp; ms : dst) std::print("{}, ", ms.data);
+    std::println();
+
+    std::vector&lt;int&gt; data{1, 2, 3, 4, 5, 6};
+    std::vector&lt;int&gt; selected;
+
+    ranges::copy_if(data, std::back_inserter(selected),
+                    std::bind_back(std::greater&lt;int&gt;{}, 4));
+    for (auto item : selected) std::print("{}, ", item);
+
+    return 0;
+}
+</code></pre>
+<h2 id="move"><a class="header" href="#move">move</a></h2>
+<p>instead of copying; move the elements from one to other. move constructor is used if the src type has it. also delete copy constructors - at the end c++ loves copying - block it.</p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;cassert&gt;
+#include &lt;cstring&gt;
+#include &lt;functional&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+struct MyS {
+    MyS() = default;
+    MyS(std::string&amp;&amp; n) : data(std::move(n)) {}
+    MyS(MyS&amp;&amp; other) {
+        std::println("MyS&amp;&amp; called");
+        data = std::move(other.data);
+    }
+    std::string data;
+};
+
+int main() {
+    std::vector&lt;std::string&gt; strs = {"hakan", "gedek", "coventry"};
+    std::vector&lt;std::string&gt; new_owner;
+
+    ranges::move(strs, std::back_inserter(new_owner));
+    for (auto&amp; elem : strs) std::print("{}, ", elem);
+    std::println();
+
+    assert(strs.size() != 0);  // str data gone but "" stays
+
+    std::vector&lt;MyS&gt; ms_old;
+    ms_old.emplace_back("hakan");
+    ms_old.emplace_back("gedek");
+
+    std::println();
+    std::vector&lt;MyS&gt; ms_new;
+    ranges::move(ms_old, std::back_inserter(ms_new));
+
+    for (auto&amp; old : ms_old) std::print("{}, ", old.data);
+    std::println();
+    for (auto&amp; nw : ms_new) std::print("{}, ", nw.data);
+    std::println();
+
+    return 0;
+}
+</code></pre>
+<h2 id="fill-fill_n"><a class="header" href="#fill-fill_n">fill, fill_n</a></h2>
+<p>fill the range with a value. fill does same job what memset does.</p>
+<pre><code class="language-c++">
+#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;cassert&gt;
+#include &lt;cstring&gt;
+#include &lt;functional&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    {
+        std::vector&lt;int&gt; data(10);
+        ranges::fill(data, -1);
+
+        for (auto elem : data) std::print("{}, ", elem);
+        std::println();
+
+        // memset vs fill
+        char name[20];
+        memset(name, 'a', sizeof name);
+        for (auto elem : name) std::print("{}, ", elem);
+        std::println();
+        // or
+        ranges::fill(name, 'b');
+        for (auto elem : name) std::print("{}, ", elem);
+        std::println();
+    }
+    {
+        std::vector&lt;int&gt; data(10);
+        ranges::fill_n(data.begin(), 5, 101);
+
+        for (auto elem : data) std::print("{}, ", elem);
+        std::println();
+    }
+
+    return 0;
+
+}
+
+</code></pre>
+<h2 id="generate-generate_n"><a class="header" href="#generate-generate_n">generate, generate_n</a></h2>
+<p>create a range with items created by a generator you have. generate_n will take iterator as first elem.</p>
+<pre><code class="language-c++">
+#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;cassert&gt;
+#include &lt;functional&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    std::random_device rnd;
+    std::mt19937 gen{rnd()};
+    std::uniform_int_distribution dis(1, 10);
+
+    {
+        std::vector&lt;int&gt; data(10);
+
+        ranges::generate(data, [&amp;dis, &amp;gen] { return dis(gen); });
+
+        for (auto elem : data) std::print("{},", elem);
+
+        std::println();
+    }
+
+    {
+        std::vector&lt;int&gt; data(10);
+
+        ranges::generate_n(data.begin(), 5, [&amp;dis, &amp;gen] { return dis(gen); });
+
+        for (auto elem : data) std::print("{},", elem);
+        std::println();
+    }
+
+    return 0;
+}
+</code></pre>
+<h2 id="transform"><a class="header" href="#transform">transform</a></h2>
+<p>this is called map in other languages. create a changed range.</p>
+<pre><code class="language-c++">
+#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;cassert&gt;
+#include &lt;functional&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    auto data = std::to_array&lt;int&gt;({1, 2, 3, 4, 5, 6});
+
+    ranges::transform(data, data.begin(), std::negate&lt;&gt;{});
+    ranges::transform(data, data.begin(),
+                      std::bind_front(std::multiplies&lt;int&gt;{}, 10));
+
+    for (auto item : data) std::print("{}, ", item);
+
+    return 0;
+}
+
+</code></pre>
+<h2 id="remove-remove_if-remove_copy-remove_copy_if"><a class="header" href="#remove-remove_if-remove_copy-remove_copy_if">remove, remove_if, remove_copy, remove_copy_if</a></h2>
+<p>remove and remove if condition applies..._copy ones don't update the range but create a new copy...</p>
+<p>remove doesn't erase the data but changes the locations of them to end of the container. you may need to call erase after it. (remove - erase idiom)</p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;cassert&gt;
+#include &lt;functional&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    {
+        std::vector data = {1, 2, 3, 4, 5, 5, 5, 6, 7};
+
+        ranges::for_each(data, [](auto elem) { std::print("{}, ", elem); });
+        std::println();
+        // deleted sub-range
+        auto sub_range = ranges::remove(data, 5);
+
+        data.erase(sub_range.begin(), sub_range.end());
+
+        ranges::for_each(data, [](auto elem) { std::print("{}, ", elem); });
+        std::println();
+        std::println();
+    }
+    {
+        std::vector data = {1, 2, 3, 4, 5, 5, 5, 6, 7};
+
+        ranges::for_each(data, [](auto elem) { std::print("{}, ", elem); });
+        std::println();
+
+        auto sub_range = ranges::remove_if(
+            data, std::bind(std::greater_equal&lt;&gt;{}, std::placeholders::_1, 5));
+
+        data.erase(sub_range.begin(), sub_range.end());
+
+        ranges::for_each(data, [](auto elem) { std::print("{}, ", elem); });
+        std::println();
+        std::println();
+    }
+    {
+        const std::vector data = {1, 2, 3, 4, 5, 5, 5, 6, 7};
+
+        std::vector&lt;int&gt; copy_data;
+        copy_data.reserve(data.size());
+
+        ranges::remove_copy(data, std::back_inserter(copy_data), 5);
+        ranges::for_each(data, [](auto elem) { std::print("{}, ", elem); });
+        std::println();
+        ranges::for_each(copy_data,
+                         [](auto elem) { std::print("{}, ", elem); });
+        std::println();
+        std::println();
+    }
+    {
+        const std::vector data = {1, 2, 3, 4, 5, 5, 5, 6, 7};
+
+        std::vector&lt;int&gt; copy_data;
+        copy_data.reserve(data.size());
+
+        ranges::remove_copy_if(data, std::back_inserter(copy_data),
+                               std::bind_back(std::greater_equal&lt;int&gt;{}, 5));
+        ranges::for_each(data, [](auto elem) { std::print("{}, ", elem); });
+        std::println();
+
+        ranges::for_each(copy_data,
+                         [](auto elem) { std::print("{}, ", elem); });
+        std::println();
+    }
+
+    return 0;
+}
+
+</code></pre>
+<h2 id="unique-unique_copy"><a class="header" href="#unique-unique_copy">unique, unique_copy</a></h2>
+<p>remove consecutive duplications so you need a sorted range. _copy will create a copy of new range.</p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    {
+        // sorted
+        std::vector data = {1, 2, 2, 3, 3, 3, 4, 5, 5};
+        auto it = ranges::unique(data);
+        data.erase(it.begin(), it.end());
+        ranges::for_each(data, [](auto elem) { std::print("{},", elem); });
+        std::println();
+    }
+    {
+        std::vector&lt;int&gt; output;
+
+        // sorted and immutable
+        constexpr auto data = std::to_array&lt;int&gt;({1, 2, 2, 3, 3, 3, 4, 5, 5});
+        // reserve to speed
+        output.reserve(data.size());
+
+        ranges::unique_copy(data, std::back_inserter(output));
+        ranges::for_each(data, [](auto elem) { std::print("{},", elem); });
+        std::println();
+        ranges::for_each(output, [](auto elem) { std::print("{},", elem); });
+    }
+
+    return 0;
+}
+
+</code></pre>
+<h2 id="sort-stable_sort"><a class="header" href="#sort-stable_sort">sort, stable_sort</a></h2>
+<p>sort all the range. if you want to keep sorted elements to keep their old position then use this ( placement is important)</p>
+<pre><code class="language-c++">
+#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    auto data = std::to_array&lt;int&gt;({5, 3, 8, 1, 9, 2, 7, 6, 4, 0, 2, 10});
+    {
+        ranges::sort(data);
+        ranges::for_each(data, [](auto val) { std::print("{},", val); });
+        std::println();
+    }
+
+    return 0;
+
+
+</code></pre>
+<h2 id="partial_sort"><a class="header" href="#partial_sort">partial_sort</a></h2>
+<p>partially sort the subrange - don't care about full range.</p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    auto data = std::to_array&lt;int&gt;({5, 3, 8, 1, 9, 2, 7, 6, 4, 0, 2, 10});
+    {
+        ranges::partial_sort(data, data.begin() + 4);
+        ranges::for_each(data, [](auto val) { std::print("{},", val); });
+        std::println();
+    }
+    {
+        ranges::sort(data);
+        ranges::for_each(data, [](auto val) { std::print("{},", val); });
+        std::println();
+    }
+
+    return 0;
+}
+</code></pre>
+<h2 id="nth_element"><a class="header" href="#nth_element">nth_element</a></h2>
+<p>only care nth element which is at the correct position as sorted. items before and after are not sorted.</p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    auto data = std::to_array&lt;int&gt;({3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5});
+    constexpr auto index = 5;
+    // looking for 5th element in sorted array but without sorting all
+
+    // Q: what's the 5th smallest element in the order ?
+
+    {
+        // nth
+        ranges::nth_element(data, data.begin() + index);
+        std::println("{}th element: {}", index, data[index]);
+        ranges::for_each(data, [](auto val) { std::print("{},", val); });
+        std::println();
+    }
+    {
+        // full-sort
+        ranges::sort(data);
+        std::println("{}th element: {}", index, data[index]);
+        ranges::for_each(data, [](auto val) { std::print("{},", val); });
+        std::println();
+    }
+
+    return 0;
+}
+
+Program stdout
+5th element: 4
+3,1,2,1,3,4,5,5,6,9,5,
+5th element: 4
+1,1,2,3,3,4,5,5,5,6,9,
+</code></pre>
+<h2 id="equal_range-lower_bound-upper_bound"><a class="header" href="#equal_range-lower_bound-upper_bound">equal_range, lower_bound, upper_bound</a></h2>
+<p>if there are duplicated elements in a range; you can get start-end pos of them like a sub-range. -valid only for <strong>sorted</strong> ranges</p>
+<p>you can use lower_bound and upper_bound :</p>
+<ul>
+<li>to create a subrange (ranges::subrange or yourself)
+<ul>
+<li>to find if item exists in the range</li>
+<li>if not exists you get either a different element position for lower bound or end of the range - control it before using</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;print&gt;
+#include &lt;ranges&gt;  // ranges::range
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+   const auto data =
+       std::to_array&lt;int&gt;({1, 2, 3, 4, 5, 5, 5, 5, 6, 7, 8, 9, 10});
+
+   auto sub_range = ranges::equal_range(data, 5);
+
+   ranges::for_each(sub_range, [](auto val) { std::print("{},", val); });
+
+   std::println();
+   std::println("count of 5: {}", sub_range.size());
+
+   auto lb = ranges::lower_bound(data, 5);
+   auto ub = ranges::upper_bound(data, 5);
+
+   ranges::subrange sub_range2(lb, ub);
+
+   ranges::for_each(sub_range, [](auto val) { std::print("{},", val); });
+
+   std::println();
+   std::println("count of 5: {}", sub_range2.size());
+
+   return 0;
+}
+
+</code></pre>
+<h2 id="merge"><a class="header" href="#merge">merge</a></h2>
+<p>merge two sorted ranges . if it's not sorted it tries to keep the sort between ranges.</p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;cassert&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    constexpr auto LENGTH = 20;
+
+    std::array&lt;int, LENGTH / 2&gt; r1;
+    std::array&lt;int, LENGTH / 2&gt; r2;
+
+    // preparation
+    std::random_device rnd;
+    std::mt19937 gen(rnd());
+
+    std::uniform_int_distribution&lt;&gt; dis(1, LENGTH * 2);
+
+    for (auto i = 0; i &lt; LENGTH / 2; ++i) r1[i] = dis(gen);
+    for (auto i = 0; i &lt; LENGTH / 2; ++i) r2[i] = dis(gen);
+
+    std::array&lt;int, LENGTH&gt; result;
+
+    ranges::merge(r1, r2, ranges::begin(result));
+
+    ranges::for_each(r1, [](auto value) { std::print("{}, ", value); });
+    std::println();
+    ranges::for_each(r2, [](auto value) { std::print("{}, ", value); });
+    std::println();
+    ranges::for_each(result, [](auto value) { std::print("{}, ", value); });
+    std::println();
+
+    ranges::sort(r1);
+    ranges::sort(r2);
+
+    ranges::merge(r1, r2, ranges::begin(result));
+
+    ranges::for_each(r1, [](auto value) { std::print("{}, ", value); });
+    std::println();
+    ranges::for_each(r2, [](auto value) { std::print("{}, ", value); });
+    std::println();
+    ranges::for_each(result, [](auto value) { std::print("{}, ", value); });
+
+    return 0;
+
+</code></pre>
+<h2 id="max-min-minmax-max_element-min_element-minmax_element"><a class="header" href="#max-min-minmax-max_element-min_element-minmax_element">max, min, minmax, max_element, min_element, minmax_element</a></h2>
+<p>search for min, max or both... if you need positions in the range use _element ones</p>
+<pre><code class="language-c++">
+#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;cassert&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    constexpr auto LENGTH = 50;
+    std::array&lt;int, LENGTH&gt; data;
+
+    // preparation
+    std::random_device rnd;
+    std::mt19937 gen(rnd());
+    std::uniform_int_distribution&lt;&gt; dis(1, LENGTH);
+
+    for (auto i = 0; i &lt; LENGTH; ++i) data[i] = dis(gen);
+    std::println("data:");
+    ranges::for_each(data, [](auto value) { std::print("{}, ", value); });
+    std::println();
+
+    std::println("min: {}", ranges::min(data));
+    std::println("max: {}", ranges::max(data));
+
+    auto p = ranges::minmax(data);
+    std::println("min: {}, max: {}", p.min, p.max);
+
+    auto min_it = ranges::min_element(data);
+    auto max_it = ranges::max_element(data);
+    auto mm_it = ranges::minmax_element(data);
+
+    std::println("min: {} pos: {}", *min_it,
+                 std::distance(ranges::begin(data), min_it));
+    std::println("max: {} pos: {}", *max_it,
+                 std::distance(ranges::begin(data), max_it));
+    std::println("min: {} pos: {}, max: {} pos: {}", *(mm_it.min),
+                 std::distance(ranges::begin(data), mm_it.min), *(mm_it.max),
+                 std::distance(ranges::begin(data), mm_it.max));
+
+    return 0;
+
+}
+
+</code></pre>
+<h2 id="iota"><a class="header" href="#iota">iota</a></h2>
+<p>fill the range with incrementing values</p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;cassert&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    std::array&lt;int, 100&gt; data;
+
+    ranges::iota(data, 0);
+
+    ranges::for_each(data, [](auto val) {
+        std::println("{}", val);
+    });
+
+    return 0;
+
+</code></pre>
+<h2 id="clamp"><a class="header" href="#clamp">clamp</a></h2>
+<p>fix the value into a boundary</p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;cassert&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    std::random_device rnd;
+    std::mt19937 gen(rnd());
+    std::uniform_int_distribution&lt;&gt; dis{1, 50};  // provides data
+
+    while (true) {
+        static int i = 0;
+
+        auto value = dis(gen);
+        auto clamped_value = ranges::clamp(value, 10, 20);
+        std::println("original: {} clamped_value: {}", value, clamped_value);
+        i++;
+
+        if (i &gt; 10) break;
+    }
+
+    return 0;
+}
+</code></pre>
+<h2 id="set-operations-includes-difference-intersection-union"><a class="header" href="#set-operations-includes-difference-intersection-union">set operations: includes, difference, intersection, union</a></h2>
+<p>may help with comparisons of two ranges if they are part of each other or you can create a union of ranges</p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;cassert&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+#include &lt;vector&gt;
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+void print(auto&amp;&amp; r) {
+    std::print(" [");
+    ranges::for_each(r, [](auto val) { std::print("{},", val); });
+    std::print("] ");
+}
+
+void includes_test(auto&amp;&amp; r1, auto&amp;&amp; r2) {  // use new generic usecase of auto&amp;&amp;
+    print(r1);
+    std::print("includes");
+    print(r2);
+    auto result = ranges::includes(r1, r2);
+    std::print("{}", result);
+    std::println();
+}
+
+void difference_test(auto&amp;&amp; r1, auto&amp;&amp; r2) {
+    print(r1);
+    std::print("different");
+    print(r2);
+    std::vector&lt;int&gt; r3;
+    auto [lhs, rhs] = ranges::set_difference(r1, r2, std::back_inserter(r3));
+    assert(lhs == r1.end());
+
+    print(r3);
+    std::println();
+    // if you've a large r3; you can remove empty items by r3.erase(rhs,
+    // r3.end());
+}
+
+void intersection_test(auto&amp;&amp; r1, auto&amp;&amp; r2) {
+    print(r1);
+    std::print("intersect");
+    print(r2);
+    std::vector&lt;int&gt; r3;
+    auto [lhs, mhs, rhs] =
+        ranges::set_intersection(r1, r2, std::back_inserter(r3));
+    assert(lhs == r1.end());
+    assert(mhs == r2.end());
+
+    print(r3);
+    std::println();
+}
+
+void union_test(auto&amp;&amp; r1, auto&amp;&amp; r2) {
+    print(r1);
+    std::print("union");
+    print(r2);
+    std::vector&lt;int&gt; r3;
+    auto [lhs, mhs, rhs] = ranges::set_union(r1, r2, std::back_inserter(r3));
+    assert(lhs == r1.end());
+    assert(mhs == r2.end());
+
+    print(r3);
+    std::println();
+}
+
+int main() {
+    auto range1 = std::to_array({1, 2, 3, 4, 5});
+    auto key1 = std::to_array({2, 3});
+    auto key2 = std::to_array({3, 2});
+    auto key3 = std::to_array({2, 4});
+    auto range2 = std::to_array({6, 7, 8, 9});
+
+    {
+        includes_test(range1, key1);
+        difference_test(range1, key1);
+        intersection_test(range1, key1);
+        union_test(range1, key1);
+        std::println();
+    }
+    {
+        includes_test(range1, key2);
+        difference_test(range1, key2);
+        intersection_test(range1, key2);
+        union_test(range1, key2);
+        std::println();
+    }
+    {
+        includes_test(range1, key3);
+        difference_test(range1, key3);
+        intersection_test(range1, key3);
+        union_test(range1, key3);
+        std::println();
+    }
+    {
+        includes_test(range1, range2);
+        difference_test(range1, range2);
+        intersection_test(range1, range2);
+        union_test(range1, range2);
+        std::println();
+    }
+
+    return 0;
+
+</code></pre>
+<h2 id="shuffle"><a class="header" href="#shuffle">shuffle</a></h2>
+<p>randomize the range - randomly replace items in a range</p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    auto arr = std::to_array({1, 2, 3, 4, 5, 6, 7, 8, 9});
+
+    std::random_device rnd;
+    std::mt19937 gen(rnd());
+
+    ranges::shuffle(arr, gen);
+
+    ranges::for_each(arr, [](auto val) { std::print("{} ", val); });
+
+    std::println();
+
+    return 0;
+}
+</code></pre>
+<h2 id="sample"><a class="header" href="#sample">sample</a></h2>
+<p>select random elements from a sequence</p>
+<p>format: <code>(in_range, out_range, count, generator)</code></p>
+<pre><code class="language-c++">#include &lt;algorithm&gt;  // ranges::algo
+#include &lt;array&gt;
+#include &lt;print&gt;
+#include &lt;random&gt;
+#include &lt;ranges&gt;  // ranges::range
+
+namespace ranges = std::ranges;
+namespace views = std::ranges::views;
+
+int main() {
+    constexpr auto arr = std::to_array({1, 2, 3, 4, 5, 6, 7, 8, 9});
+    constexpr auto len = 4;
+
+    std::random_device rnd;
+    std::mt19937 gen(rnd());
+
+    std::array&lt;int, len&gt; out;
+
+    ranges::sample(arr, out.begin(), len, gen);
+
+    ranges::for_each(out, [](int val) { std::print("{} ", val); });
+    std::println();
+
+    return 0;
+}
+
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="expected.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="monadic_ops_with_optinal.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="expected.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="monadic_ops_with_optinal.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

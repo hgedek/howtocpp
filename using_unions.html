@@ -1,0 +1,409 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>use union - How-to C++</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">How-to C++</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="use-union"><a class="header" href="#use-union">use union</a></h1>
+<p>c type like struct...</p>
+<p>use case: sharing memory for different types - accessing to same memory via different options</p>
+<pre><code class="language-c++">
+
+union MyU {
+    uint16_t s;
+    uint8_t c[2];
+};
+int main() {
+    MyU mu;
+    mu.s = (0xB &lt;&lt; 8) | 0xB;
+
+    std::println("{} {}", mu.c[0], mu.c[1]);
+
+    return 0;
+}
+
+</code></pre>
+<p>check also <code>anonymous struct and union</code> page.</p>
+<p>c++ has <code>variant</code> type that does a better job but if you are interested you can develop your own variant type too.</p>
+<pre><code class="language-c++">
+#include &lt;cassert&gt;
+#include &lt;iostream&gt;
+#include &lt;print&gt;
+#include &lt;typeindex&gt;
+#include &lt;typeinfo&gt;
+#include &lt;unordered_map&gt;
+
+struct variant {
+   private:
+    enum type { Byte, Short, Int, Float, Double, Long, String } _type;
+
+    union {
+        int8_t _c;
+        int16_t _s;
+        int32_t _i;
+        float _f;
+        double _d;
+        int64_t _l;
+        const char *_st;
+    } _data;
+
+    static inline std::unordered_map&lt;std::type_index, type&gt; tbl = {
+        {std::type_index(typeid(char)), type::Byte},
+        {std::type_index(typeid(int8_t)), type::Byte},
+        {std::type_index(typeid(int16_t)), type::Short},
+        {std::type_index(typeid(int32_t)), type::Int},
+        {std::type_index(typeid(float)), type::Float},
+        {std::type_index(typeid(double)), type::Double},
+        {std::type_index(typeid(int64_t)), type::Long},
+        {std::type_index(typeid(std::string)), type::String},
+        {std::type_index(typeid(const char *)), type::String}};
+    template &lt;class T&gt;
+    constexpr T get_value() const {
+        using type = std::remove_cvref_t&lt;T&gt;;
+
+        if constexpr (std::same_as&lt;type, int8_t&gt; || std::same_as&lt;type, char&gt;) {
+            return _data._c;
+        } else if constexpr (std::same_as&lt;type, int16_t&gt;) {
+            return _data._s;
+        } else if constexpr (std::same_as&lt;type, int32_t&gt;) {
+            return _data._i;
+        } else if constexpr (std::same_as&lt;type, int64_t&gt;) {
+            return _data._l;
+        } else if constexpr (std::same_as&lt;type, float&gt;) {
+            return _data._f;
+        } else if constexpr (std::same_as&lt;type, double&gt;) {
+            return _data._d;
+        } else if constexpr (std::same_as&lt;type, std::string&gt; ||
+                             std::same_as&lt;type, const char *&gt;) {
+            return _data._st;
+        } else
+            throw std::invalid_argument("unknown type int get");
+    }
+
+    template &lt;class T&gt;
+    constexpr void set_value(T &amp;&amp;val) {
+        using type = std::remove_cvref_t&lt;T&gt;;
+
+        if constexpr (std::same_as&lt;type, int8_t&gt; || std::same_as&lt;type, char&gt;) {
+            _data._c = val;
+        } else if constexpr (std::same_as&lt;type, int16_t&gt;) {
+            _data._s = val;
+        } else if constexpr (std::same_as&lt;type, int32_t&gt;) {
+            _data._i = val;
+        } else if constexpr (std::same_as&lt;type, int64_t&gt;) {
+            _data._l = val;
+        } else if constexpr (std::same_as&lt;type, float&gt;) {
+            _data._f = val;
+        } else if constexpr (std::same_as&lt;type, double&gt;) {
+            _data._d = val;
+        } else if constexpr (std::same_as&lt;type, std::string&gt;) {
+            // i will not take ownership but you can impl it if you want
+            // create a new byte[] and memcpy it but dont forget to release it
+            _data._st = val.data();
+        } else {
+            throw std::invalid_argument("unknown type in set");
+        }
+    }
+
+    template &lt;size_t N&gt;
+    constexpr void set_value(const char (&amp;arr)[N]) {
+        _data._st = arr;
+    }
+
+   public:
+    template &lt;class T&gt;
+    constexpr variant(T &amp;&amp;arg)
+        : _type(tbl[std::type_index(typeid(std::remove_cvref_t&lt;T&gt;))]) {
+        set_value(std::forward&lt;T&gt;(arg));
+    }
+
+    template &lt;class T&gt;
+    constexpr operator T() const {
+        if (tbl[std::type_index(typeid(std::remove_cvref_t&lt;T&gt;))] != _type)
+            throw std::invalid_argument("invalid type casting");
+
+        return get_value&lt;T&gt;();
+    }
+
+    constexpr operator char const *() const {
+        return get_value&lt;char const *&gt;();
+    }
+};
+
+int main() {
+    variant v{10};
+
+    const int i = v;
+    assert(i == 10);
+
+    variant str{"hakan gedek"};
+    const char *sptr = str;
+
+    assert("hakan gedek" == sptr);
+
+    std::string name = "hakan gedek";
+    variant str2{name};
+
+    std::string name2 = str2;
+    assert(name2 == name);
+
+}
+
+</code></pre>
+<p>another example...</p>
+<pre><code class="language-c++">
+  union Data
+    {
+        int d_first;
+        double d_second;
+        std::string *d_third;
+    };
+                        // initialize the union's d_third field:
+    Data data{ .d_third = new string{ "hello" } };
+</code></pre>
+<p>an ugly example :)</p>
+<pre><code class="language-c++">
+struct Address {
+    union {
+        long __data;
+        struct { short __s1, __s2; } __first;
+        struct { int __s3, __s4; } __second;
+    } __un;
+#define data __un.__data
+#define first __un.__first
+#define s1 first.__s1
+#define s2 first.__s2
+#define second __un.__second
+#define s3 second.__s3
+#define s4 second.__s4
+};
+void print(auto&amp;&amp;...args) {
+    (std::cout &lt;&lt; ... &lt;&lt; args) &lt;&lt; std::endl;
+}
+int main() {
+    Address addr;
+
+    addr.data = 0xFFAAFF00CC00;
+    print(std::hex,addr.s1);
+    print(std::hex, addr.s2);
+    print(std::hex, addr.s3);
+    print(std::hex, addr.s4);
+}
+
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="template_type_in_templates.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="nested_namespaces.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="template_type_in_templates.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="nested_namespaces.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

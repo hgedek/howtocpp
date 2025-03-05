@@ -169,7 +169,7 @@ struct Manager {
   public:
     template &lt;class... Ts&gt;
         requires std::same_as&lt;std::tuple&lt;Ts...&gt;, decltype(m_Data)&gt;
-    static Manager create(Ts... args) {
+    static Manager instance(Ts... args) {
         static Manager inst{std::forward&lt;Ts&gt;(args)...};
         return inst;
     }
@@ -177,7 +177,7 @@ struct Manager {
 
 </code></pre>
 <pre><code class="language-c++">// using shared_ptr
-struct manager {
+struct Manager {
     private:
     std::tuple&lt;int, float&gt; m_Data;
 
@@ -188,11 +188,65 @@ struct manager {
 
     template &lt;class...Ts&gt;
         requires std::same_as&lt;std::tuple&lt;Ts...&gt;, decltype(m_Data)&gt; 
-    static std::shared_ptr&lt;Manager&gt; create(Ts...args) {
+    static std::shared_ptr&lt;Manager&gt; instance(Ts...args) {
         static std::shared_ptr&lt;Manager&gt; inst{std::forward&lt;Ts&gt;(args)...};
         return inst;
     }
 };
+</code></pre>
+<pre><code class="language-c++">// using call-once 
+class Manager;
+
+class Deletor {
+public:
+    void operator()(Manager* inst);
+};
+
+class Manager {
+    Manager() { std::cout &lt;&lt; "instance" &lt;&lt; std::endl; }
+    Manager(Manager const&amp;) = delete;
+    Manager(Manager&amp;&amp;) = delete;
+
+    ~Manager() = default;
+    
+public:
+    static Manager&amp; instance() {
+        std::call_once(flag_, []{
+            inst_ = std::unique_ptr&lt;Manager, Deletor&gt;(new Manager(), Deletor());
+        });
+
+        return *inst_;
+    }
+
+    inline static std::unique_ptr&lt;Manager, Deletor&gt;  inst_;
+    inline static std::once_flag flag_;
+
+    friend Deletor;
+};
+
+
+void Deletor::operator()(Manager* inst) {
+    delete inst;
+}
+
+void foo() {
+    [[maybe_unused]]
+    auto&amp; inst = Manager::instance();
+}
+
+int main() {
+    std::jthread{foo},
+    std::jthread{foo},
+    std::jthread{foo},
+    std::jthread{foo},
+    std::jthread{foo},
+    std::jthread{foo};
+
+    std::this_thread::sleep_for(2s);
+
+    return 0;
+}
+
 </code></pre>
 <blockquote>
 <p>If you want you can use define your instance as atomic too.</p>
@@ -202,7 +256,7 @@ struct manager {
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="vopts_vargs_togeter.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="init_fields_with_function_calls.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
@@ -216,7 +270,7 @@ struct manager {
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="vopts_vargs_togeter.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="init_fields_with_function_calls.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 

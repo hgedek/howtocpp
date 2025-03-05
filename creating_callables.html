@@ -1,0 +1,508 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>create callables - How-to C++</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">How-to C++</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="create-callables"><a class="header" href="#create-callables">create callables</a></h1>
+<blockquote>
+<p>callable: types which can be called like a function...</p>
+</blockquote>
+<h2 id="stdfunction"><a class="header" href="#stdfunction">std::function</a></h2>
+<p>this can wrap any callable and can be stored in a vector. it's usa case is wide.</p>
+<ul>
+<li>wraps callables</li>
+<li>can be used as a callable</li>
+<li>can be used in containers</li>
+<li>usable with std::invoke or std::apply</li>
+</ul>
+<pre><code class="language-c++">
+template &lt;class Fn&gt;
+void foo(Fn&amp;&amp; fn) {
+    std::invoke(fn);
+}
+
+template &lt;class Fn&gt;
+void bar(std::function&lt;Fn&gt; const&amp; fn) {
+    std::invoke(fn);
+}
+
+void my_foo() { std::cout &lt;&lt; "my_foo" &lt;&lt; std::endl; }
+
+struct functor {
+    void operator()() { std::cout &lt;&lt; "functor" &lt;&lt; std::endl; }
+};
+
+using fn_t = std::function&lt;void()&gt;;
+
+using fn_ptr_t = void (*)();
+
+int main() {
+    std::vector&lt;fn_t&gt; fns{functor{}, my_foo};
+    for (auto&amp;&amp; fn : fns) std::invoke(fn);
+
+    fn_t foo_ins = my_foo;
+    fn_t func_ins = functor{};
+
+    foo(foo_ins);
+    bar(func_ins);
+
+    fn_ptr_t f_ptr = my_foo;
+    foo(f_ptr);
+
+    return 0;
+}
+
+</code></pre>
+<h2 id="functor"><a class="header" href="#functor">functor</a></h2>
+<p>function objects - a class/struct type which implemented <code>operator()</code> function. there are many pre-defined functors in std lib like greater,less,negate,plus, not_fn,...they are useful for clean coding.</p>
+<ul>
+<li>class/struct type</li>
+<li>can be used in containers</li>
+<li>can be used with invoke/apply</li>
+<li><code>operator()</code> can be overloaded</li>
+</ul>
+<pre><code class="language-c++">
+class MyClass {
+   public:
+    void operator()() { std::cout &lt;&lt; "void" &lt;&lt; std::endl; }
+    void operator()(int) { std::cout &lt;&lt; "one arg" &lt;&lt; std::endl; }
+    void operator()(int, int) { std::cout &lt;&lt; "two args" &lt;&lt; std::endl; }
+};
+
+int main() {
+    MyClass func_obj;
+
+    std::invoke(func_obj);
+    std::invoke(func_obj, 0);
+    std::invoke(func_obj, 0, 1);
+
+    std::vector&lt;int&gt; v{1, 2, 3, 4};
+    std::for_each(v.begin(), v.end(), MyClass{});
+
+
+    // checks at compilation time if func_obj supports the necessary convertion with operator() functions
+    std::function&lt;void()&gt; fn_0 = func_obj;
+    std::function&lt;void(int)&gt; fn_1 = func_obj;
+    std::function&lt;void(int, int)&gt; fn_2 = func_obj;
+
+    return 0;
+}
+
+
+</code></pre>
+<h2 id="lambda"><a class="header" href="#lambda">lambda</a></h2>
+<p>anonymous functors - compiler generates it's class name and <code>operator()</code> functions according to your lambda definition. it's by default immutable but you can change is by using <code>mutable</code>.</p>
+<pre><code class="language-c++">
+struct type {
+    type() = default;
+    type(const type&amp;) = delete;
+};
+
+std::ostream&amp; operator&lt;&lt;(std::ostream&amp; out, type const&amp;) {
+    out &lt;&lt; "type obj" &lt;&lt; std::endl;
+    return out;
+}
+
+// out of function
+const auto out_of_func_l = [](int arg) { std::cout &lt;&lt; arg &lt;&lt; std::endl; };
+
+int main() {
+
+    // internal
+    const auto func_l = [](int arg) { std::cout &lt;&lt; arg &lt;&lt; std::endl; };
+
+    out_of_func_l(0);
+    func_l(0);
+
+    // capture by ref
+    {
+        auto x = 0;
+
+        auto ref_l = [&amp;x] { x = 101; };
+
+        ref_l();
+
+        // inner updated outer because both are same
+        assert(x == 101);
+    }
+
+    {
+        auto y = 0;
+
+        auto val_l = [y] mutable { y = 101; }; // use mutable to update member y (belongs to lambda object)
+
+        // no update for outer one
+        assert(y == 0);
+    }
+
+    // generic lambda: can be defined with `template` or just `auto`
+    {
+
+        const auto template_l = []&lt;typename T&gt;(T value) {
+            std::cout &lt;&lt; value &lt;&lt; std::endl;
+        };
+
+        const auto template_univ_l = []&lt;typename T&gt;(T&amp;&amp; value) {
+            std::cout &lt;&lt; value &lt;&lt; std::endl;
+        };
+
+        template_l(1);
+        template_l("hakan gedek");
+
+        template_univ_l(1);
+        template_univ_l("hakan gedek");
+
+        type t;
+        template_univ_l(t); // template_l fails - doesnt' accept &amp;
+    }
+
+    {
+        const auto auto_template_l = [](auto value) {
+            std::cout &lt;&lt; value &lt;&lt; std::endl;
+        };
+
+        type t;
+        auto_template_l(1);
+        auto_template_l("hakan gedek");
+        // auto_template_l(t); =&gt; fails =&gt; auto without &amp; allows only moved or copied
+
+        const auto auto_univ_template_l = [](auto&amp;&amp; value) {
+            std::cout &lt;&lt; value &lt;&lt; std::endl;
+        };
+
+        auto_univ_template_l(1);
+        auto_univ_template_l("hakan gedek");
+        auto_univ_template_l(t);
+    }
+}
+
+
+</code></pre>
+<p>capture by ref: be careful with scopes and lifetime of captured variables</p>
+<pre><code class="language-c++">
+// this is invalid but it will be compiled
+int main() {
+    std::function&lt;void()&gt; fn;
+
+    {
+        int x = 0;
+
+        fn = [&amp;x] { x = 101; };
+    }
+
+    // x goes out of scope and not valid =&gt; UB
+
+    fn();
+}
+
+</code></pre>
+<p>this is correct impl. if you keep lambda definition longer then captured variables then capture them by value and if you will update them then make lambda mutable - if you want to alias them [new_name = x] is used</p>
+<pre><code class="language-c++">int main() {
+    std::function&lt;void()&gt; fn;
+
+    {
+        int x = 0;
+
+        fn = [x] mutable { x = 101; std::cout &lt;&lt; x &lt;&lt; std::endl;};
+    }
+    fn();
+
+</code></pre>
+<h2 id="function-pointer"><a class="header" href="#function-pointer">function pointer</a></h2>
+<p>oldest method...like anything else functions also have a memory address so why not having a pointer for them too ? if you have a memory address then you have a pointer too !</p>
+<pre><code class="language-c++">
+// type
+typedef void(*fptr_t)(int);
+// or
+// using f_ptr_t = void(*)(int);
+
+// var
+void (*fvar)(int);
+
+void foo(int arg) {
+    std::cout &lt;&lt; arg &lt;&lt; std::endl;
+}
+
+int main() {
+    fvar = foo;
+
+    fptr_t fn = foo;
+
+    fvar(1);
+    fn(1);
+
+    return 0;
+}
+
+</code></pre>
+<blockquote>
+<p>allowed to be used in containers like std::function but function pointers are faster - better performance (benchmark shows that lambda and function pointers are faster than function objects )</p>
+</blockquote>
+<pre><code class="language-c++">
+using fptr_t = void (*)(int);
+
+void foo(int arg) { std::cout &lt;&lt; arg &lt;&lt; std::endl; }
+
+int main() {
+    std::vector&lt;fptr_t&gt; fns{foo, foo, foo};
+
+    for (auto&amp; fn : fns) fn(1);
+
+}
+
+</code></pre>
+<blockquote>
+<p>std::function is a great tool to convert callables into objects which can be stored in containers</p>
+</blockquote>
+<p>you can keep function pointers or functors too but std::function is more readable and more generic.</p>
+<pre><code class="language-c++">
+class CallbackHandler {
+public:
+    void registerCallback(std::function&lt;void(int)&gt; callback) {
+        callbacks.push_back(callback);
+    }
+
+    void triggerCallbacks(int value) {
+        for (auto&amp; callback : callbacks) {
+            callback(value);
+        }
+    }
+
+private:
+    std::vector&lt;std::function&lt;void(int)&gt;&gt; callbacks;
+};
+
+void demonstrateCallbackUsage() {
+    std::cout &lt;&lt; "\n--- Callback Reference Handling ---\n";
+
+    int shared_state = 0;
+    CallbackHandler handler;
+
+    // Register callbacks with reference to shared state
+    handler.registerCallback([&amp;shared_state](int increment) {
+        shared_state += increment;
+    });
+
+    handler.triggerCallbacks(10);
+
+    std::cout &lt;&lt; "Shared state after callback: " &lt;&lt; shared_state &lt;&lt; std::endl;
+}
+
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="variadic_inheritance.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="creating_package_task.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="variadic_inheritance.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="creating_package_task.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

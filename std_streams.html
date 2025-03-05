@@ -1,0 +1,784 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>use std streams - How-to C++</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">How-to C++</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="use-std-streams"><a class="header" href="#use-std-streams">use std streams</a></h1>
+<ul>
+<li>stream types re wrapper types around some input / output devices which re called *buf objects
+<ul>
+<li>streambuf</li>
+<li>filebuf</li>
+<li>spanbuf</li>
+<li>...</li>
+</ul>
+</li>
+<li>you have 2 area
+<ul>
+<li>get</li>
+<li>put</li>
+</ul>
+</li>
+<li>each area has specific operation methods in stream and buf types
+<ul>
+<li>seekg</li>
+<li>tellg</li>
+<li>seekp</li>
+<li>tellp</li>
+</ul>
+</li>
+<li>these methods are not related...if you read your gptr of read moves on stream but that doesn't effect the write pointer so you should need sync them if you need
+<ul>
+<li>seekp(tellg()) ... bring writer to current pos of reader</li>
+</ul>
+</li>
+<li>there re 2 group of operation
+<ul>
+<li>formatted
+<ul>
+<li>&lt;&lt;</li>
+<li>&gt;&gt;</li>
+</ul>
+</li>
+<li>unformatted
+<ul>
+<li>many methods
+<ul>
+<li>put</li>
+<li>putback</li>
+<li>get</li>
+<li>getline</li>
+<li>unget</li>
+<li>read</li>
+<li>write</li>
+<li>readsome</li>
+<li>gcount</li>
+<li>peek</li>
+<li>ignore</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>unformatted handles data as byte array so you will need to convert your target/src data to char* with sizeof it</li>
+<li>unformatted allows you to control how to read / write data using delims or size etc...</li>
+</ul>
+</li>
+<li>rdbuf allows you to access device lying under stream object</li>
+<li>rdbuf allows you to share same device with in/out stream types like you can use cout device !</li>
+<li>when you set rdbuf object it also returns original so keep it and set it back</li>
+<li>a stream object can be
+<ul>
+<li>good
+<ul>
+<li>no problem</li>
+</ul>
+</li>
+<li>fail
+<ul>
+<li>recover with clear and continue if you wish</li>
+</ul>
+</li>
+<li>bad
+<ul>
+<li>not recoverable</li>
+</ul>
+</li>
+<li>eof
+<ul>
+<li>stops</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>exceptions not enabled but using .exceptions(flag) we can enable it and if stream obj enters into that state it throws</li>
+<li>tie: takes ostream type so you can tie in and out ostream objects...cin.tie(&amp;cout)...so when cin used it firstly flush to cout...</li>
+<li>you can set flags either using setf or unsetf or you can use manipulators function pointers like &lt;&lt; std::skipws etc...
+<ul>
+<li>some of them belong to same mask group
+<ul>
+<li>dec</li>
+<li>oct</li>
+<li>hex
+<ul>
+<li>basedfield
+<ul>
+<li>setf(dec, basefield)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>left</li>
+<li>right</li>
+<li>internal
+<ul>
+<li>adjustfield</li>
+</ul>
+</li>
+<li>scientific</li>
+<li>fixed
+<ul>
+<li>floatfield</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>iostate is a unsigned int which used as a mask to hold state data...you can bitwise bits
+<ul>
+<li>ios::goodbit</li>
+<li>ios::failbit</li>
+<li>ios::badbit</li>
+<li>ios::eofbit</li>
+</ul>
+</li>
+<li>seekdir manages positioning enums...
+<ul>
+<li>beg</li>
+<li>cur</li>
+<li>end
+<ul>
+<li>use to move related pointers over stream</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>streams re convertible to bool or void* so
+<ul>
+<li>if operations fails pointers stops at the pos and stream obj returns and if you check it in if () or while it will say it's state
+<ul>
+<li>good =&gt; true</li>
+<li>others =&gt; false
+<ul>
+<li>while ((ss &gt;&gt; word)) {}</li>
+<li>if ( ss &gt;&gt; ch)</li>
+<li>if (ss.get(name, 10, 0)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>0 == '\0' : ascii table 0th item</li>
+<li>opening modes
+<ul>
+<li>in
+<ul>
+<li>to read</li>
+</ul>
+</li>
+<li>out
+<ul>
+<li>to write</li>
+</ul>
+</li>
+<li>ate
+<ul>
+<li>at start pointer moves to end but you can move around the pointers</li>
+</ul>
+</li>
+<li>app
+<ul>
+<li>pointer moves to end of stream and it always stay there : not movable</li>
+</ul>
+</li>
+<li>trunc
+<ul>
+<li>clear everything</li>
+</ul>
+</li>
+<li>binary
+<ul>
+<li>not formatted</li>
+</ul>
+</li>
+<li>you can open a file in multiple modes
+<ul>
+<li>in | out</li>
+<li>in | out | ate</li>
+<li>in | out | trunc</li>
+<li>out | app</li>
+<li>in | app</li>
+<li>...
+<ul>
+<li>you can open input streams with out too🙂
+<ul>
+<li>ifstream index { "index", ios::in | ios::out | ios::trunc}
+<ul>
+<li>at the end you re opening a file</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>if you ve 2 area together like stringstream; when passing modes { read -&gt; write or write -&gt; read }
+<ul>
+<li>always use seekg / seekp otherwise it will not work</li>
+</ul>
+</li>
+</ul>
+<p>At the end almost all methods belong to buffers...</p>
+<ul>
+<li>streambuf</li>
+<li>filebuf</li>
+<li>stringbuf</li>
+<li>spanbuf</li>
+</ul>
+<p>and they don't have a in/out type difference; there is only one type of buf... but stream types have 2 - in or out and this difference is for methos to access like read or write but at the end buf is same ( io device ) so you can share and use between...</p>
+<pre><code class="language-c++">ifstream file{"file", ios::in | ios::trunc | ios::out };
+ostream out (file.rdbuf()); // we set the buf as in and out ..so buf is allowed to use both in and out...i'm accessing in features over ifstream but out features on ostream
+</code></pre>
+<p>using get and getline with streams:</p>
+<pre><code class="language-c++">#include &lt;sstream&gt;
+#include &lt;iostream&gt;
+
+using namespace std;
+
+int main() {
+    stringstream ss;
+
+    char const name[] = "hakan";
+    char const surname[] = "gedek";
+
+    ss.write(name, sizeof name);
+    ss.write(surname, sizeof surname);
+
+    cout &lt;&lt; ss.tellp() &lt;&lt; endl;
+
+    string sname(10, '\0'), ssurname(10, '\0');
+
+    ss.getline(&amp;sname[0], 10, 0);
+
+    cout &lt;&lt; ss.tellg() &lt;&lt; endl;
+
+    ss.getline(&amp;ssurname[0], 10, 0);
+
+    cout &lt;&lt; ss.tellg() &lt;&lt; endl;
+    cout &lt;&lt; sname &lt;&lt; ":" &lt;&lt; ssurname &lt;&lt; endl;
+}
+
+</code></pre>
+<p>formatted ops: &lt;&lt; and &gt;&gt;</p>
+<p>unformatted:</p>
+<ul>
+<li>read</li>
+<li>write</li>
+<li>get</li>
+<li>getline</li>
+<li>put</li>
+<li>ignore</li>
+<li>putback</li>
+<li>unget</li>
+<li>gcount</li>
+</ul>
+<blockquote>
+<p>at the end a stream has either get or put area or both... each has a current pointer and start and end pointer for stream... so you control them tellg seekg tellp seekp methods.. which they actually use streambuf operations that you can access over rdbuf</p>
+</blockquote>
+<h2 id="iostate"><a class="header" href="#iostate">iostate</a></h2>
+<p>state flag of the stream</p>
+<p>goodbit : no error
+failbit : io failed but recoverable
+badbit: failed and not recoverable
+eofbit: input sequence reached to end</p>
+<p>EOF =&gt; defined macro and value is -1</p>
+<p>setstate(iostate)
+rdstate() -&gt; iostate
+clear() -&gt; clears</p>
+<p>iostate =&gt; unsigned</p>
+<h2 id="write-modes"><a class="header" href="#write-modes">write modes</a></h2>
+<ul>
+<li>app
+<ul>
+<li>always writes to end of the stream - pointer cant move</li>
+</ul>
+</li>
+<li>out
+<ul>
+<li>pointer starts from 0th index to overwrite the stream</li>
+</ul>
+</li>
+<li>trunc
+<ul>
+<li>clear contents</li>
+</ul>
+</li>
+<li>ate
+<ul>
+<li>pointers moves to end of the stream at first</li>
+<li>pointer is flexible to move anywhere so it's under dev control over stream</li>
+</ul>
+</li>
+</ul>
+<h2 id="file-modes"><a class="header" href="#file-modes">file modes</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>mode</th><th>openmode &amp; ~ate</th><th>Action if file already exists Action if file does not exist</th></tr></thead><tbody>
+<tr><td>"r"</td><td>in</td><td>Read from start Failure to open</td></tr>
+<tr><td>"w"</td><td>out, out|trunc</td><td>Destroy contents Create new</td></tr>
+<tr><td>"a"</td><td>app, out|app</td><td>Append to file Create new</td></tr>
+<tr><td>"r+"</td><td>out|in</td><td>Read from start Error</td></tr>
+<tr><td>"w+"</td><td>out|in|trunc</td><td>Destroy contents Create new</td></tr>
+<tr><td>"a+"</td><td>out|in|app, in|app</td><td>Write to end Create new</td></tr>
+<tr><td>"wx"</td><td>out|noreplace, out|noreplace|trunc</td><td>Failure to open Create new</td></tr>
+<tr><td>"w+x"</td><td>out|in|noreplace|trunc</td><td>Failure to open Create new</td></tr>
+<tr><td>"rb"</td><td>binary|in Read from start</td><td>Failure to open</td></tr>
+<tr><td>"wb"</td><td>binary|out, binary|out|trunc</td><td>Destroy contents Create new</td></tr>
+<tr><td>"ab"</td><td>binary|app, binary|out|app</td><td>Write to end Create new</td></tr>
+<tr><td>"r+b"</td><td>binary|out|in</td><td>Read from start Error</td></tr>
+<tr><td>"w+b"</td><td>binary|out|in|trunc</td><td>Destroy contents Create new</td></tr>
+<tr><td>"a+b"</td><td>binary|out|in|app, binary|in|app</td><td>Write to end Create new</td></tr>
+<tr><td>"wbx"</td><td>binary|out|noreplace, binary|out|noreplace|trunc</td><td>Failure to open Create new</td></tr>
+<tr><td>"w+bx"</td><td>binary|out|in|noreplace|trunc</td><td>Failure to open Create new</td></tr>
+</tbody></table>
+</div>
+<h2 id="stream-positioning"><a class="header" href="#stream-positioning">stream positioning</a></h2>
+<p>ostream</p>
+<ul>
+<li>tellp</li>
+<li>seekp</li>
+</ul>
+<p>istream:</p>
+<ul>
+<li>tellg</li>
+<li>seekg</li>
+</ul>
+<p>both uses :beg, :cur, :end as start pos for positioning
+both uses tell* to identify the current positioning</p>
+<h2 id="read--write---together"><a class="header" href="#read--write---together">read &amp; write - together</a></h2>
+<p>to use read &amp; write in any order you need to use seekp &amp; seekg to activate correct stream...otherwise it fails.</p>
+<pre><code class="language-c++">
+fstream f("file", ios::in | ios::out);
+string str;
+
+f &gt;&gt; str; // extract first word
+
+f.seekp(0, ios::cur); // activate writer at the cur pos
+f &lt;&lt; "hakan";
+
+f.seekg(0, ios::cur);
+f &gt;&gt; str;
+
+</code></pre>
+<p>seekg : activate istream
+seekp : activate ostream</p>
+<p>when passing between istream / ostream use clear -&gt; otherwise failing...check snippet:</p>
+<pre><code class="language-c++">    fstream f{"/tmp/file", ios::in | ios::out};
+
+    if (not f) {
+        f.clear();
+        cerr &lt;&lt; "failed\n";
+        f.open("/tmp/file", ios::in | ios::out | ios::trunc);
+    }
+    if (not f) {
+        cerr &lt;&lt; "opening `/tmp/file` failed" &lt;&lt; '\n';
+        return -1;
+    }
+    cerr &lt;&lt; "we are at:" &lt;&lt; f.tellp() &lt;&lt; '\n';
+
+    f &lt;&lt; "hello hakan gedek";
+    cerr &lt;&lt; "we are at:" &lt;&lt; f.tellp() &lt;&lt; '\n';
+
+    f.seekg(0);
+    string s;
+
+    getline(f, s);
+
+    cout &lt;&lt; s &lt;&lt; endl;
+</code></pre>
+<blockquote>
+<p>if ios::fail is true =&gt; use clear to clear the stream</p>
+</blockquote>
+<blockquote>
+<p>if position &lt; 0 =&gt; use clear to pos the cursor correctly</p>
+</blockquote>
+<pre><code class="language-c++">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+using namespace std;
+
+int main() {
+
+    fstream f{"/tmp/file", ios::in | ios::out | ios::trunc};
+
+    f &lt;&lt; "hakan gedek";
+
+    string s;
+    cout.setf(ios::boolalpha);
+
+    f.seekg(0);
+    cout &lt;&lt; f.fail() &lt;&lt; ":" &lt;&lt; f.bad() &lt;&lt; '\n';
+
+    getline(f, s);
+    cout &lt;&lt; f.fail() &lt;&lt; ":" &lt;&lt; f.bad() &lt;&lt; '\n';
+
+    f.clear();
+
+    cout &lt;&lt; s &lt;&lt; '\n';
+
+    f.seekp(0, ios::end);
+    cout &lt;&lt; f.tellp() &lt;&lt; endl;
+
+    f &lt;&lt; " aksaray";
+    cout &lt;&lt; f.tellp() &lt;&lt; endl;
+
+    f.clear();
+    f.seekg(0);
+
+    getline(f, s);
+    cout &lt;&lt; s &lt;&lt; endl;
+
+    return 0;
+}
+</code></pre>
+<h2 id="extracting-from-stream-in-loop"><a class="header" href="#extracting-from-stream-in-loop">extracting from stream in loop</a></h2>
+<p>&gt;&gt; and &lt;&lt; =&gt; moves forward the iterator</p>
+<p>use sstream items</p>
+<ul>
+<li>istringstream</li>
+<li>ostringstream</li>
+<li>stringstream
+for memory streams</li>
+</ul>
+<pre><code class="language-c++">istringstream iss{"123 455"};
+
+while (not iss.eof() and not iss.bad())
+{
+    int x;
+    iss &gt;&gt; x;
+    cout &lt;&lt; x &lt;&lt; endl;
+}
+</code></pre>
+<h2 id="ostream"><a class="header" href="#ostream">ostream</a></h2>
+<ul>
+<li>put(char)</li>
+<li>write(buffer, len)</li>
+</ul>
+<p>opening</p>
+<ul>
+<li>app
+<ul>
+<li>append to existing</li>
+<li>create if not exist</li>
+<li>always writes to end of the file ..positioning doesnt work</li>
+</ul>
+</li>
+<li>ate
+<ul>
+<li>append to existing</li>
+<li>can wander inside the file using positioning</li>
+<li>to keep the contents | with other flags like ::in for opening to write
+<ul>
+<li>ate | in</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>out
+<ul>
+<li>create if necessary</li>
+<li>trunc</li>
+</ul>
+</li>
+<li>trunc
+<ul>
+<li>existing opened and cleared</li>
+</ul>
+</li>
+</ul>
+<p>in | out =&gt; readable / writable but file should be exist
+in | out | trunc =&gt; readable / writable but created empty first</p>
+<h2 id="istream"><a class="header" href="#istream">istream</a></h2>
+<p>get and getline</p>
+<pre><code class="language-c++">get(buffer, len, delim)
+getline(buffer, len, delim)
+
+diff ?
+- getline removes the delim from stream...get keeps
+
+</code></pre>
+<p>getline removes the delim from the stream and stops
+get doesn't remove the delim but stops</p>
+<ul>
+<li>ignore()</li>
+<li>ignore(len)</li>
+<li>ignore(len, delim)</li>
+<li>peek()
+<ul>
+<li>return the next char</li>
+</ul>
+</li>
+<li>putback(char)
+<ul>
+<li>push back the char as next char</li>
+</ul>
+</li>
+<li>read(buffer, len)</li>
+<li>gcount
+<ul>
+<li>count of the character read</li>
+</ul>
+</li>
+<li>readsome(buffer, len)
+<ul>
+<li>no flag setting for eof/fail
+<ul>
+<li>allows to track the file ?</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>unget
+<ul>
+<li>returns back the last read char to stream
+<ul>
+<li>auto putback</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>get
+<ul>
+<li>3 forms
+<ul>
+<li>int get() : returns the next char as int</li>
+<li>istream&amp; get(char&amp;)
+<ul>
+<li>read the char to ch and keep state into istream</li>
+</ul>
+</li>
+<li>istream&amp; get(buffer, len, delim)
+<ul>
+<li>getline style with keeping all in the stream</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>getline
+<ul>
+<li>get the line without keeping the delim</li>
+</ul>
+</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="streambuf_iterator.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="iterator_adaptors.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="streambuf_iterator.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="iterator_adaptors.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

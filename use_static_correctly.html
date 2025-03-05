@@ -1,0 +1,367 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>use static correctly - How-to C++</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">How-to C++</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="use-static-correctly"><a class="header" href="#use-static-correctly">use static correctly</a></h1>
+<p>hide the data in the used scope - doesn't allow access from outside. uses special memory areas known as <code>static storage area</code> or <code>data segment</code>. if the variable is initialized then it's allocated in <code>initialized area</code> or <code>not initialized area</code>.</p>
+<p>types:</p>
+<ul>
+<li>module: hide the data into translation unit, no access from outside ( module =&gt; .cpp file). it's shared by functions located in this TU(module).</li>
+<li>function: hide the data into function scope and share it by this functions users.</li>
+<li>class: hide the data into class scope and share it by class instances: also called as class variable or function.</li>
+</ul>
+<p>use cases:</p>
+<ul>
+<li>static variable allocated at the beginning of the program - before main called so it can be used to check some pre-conditions</li>
+<li>they have a unique memory address so it's address can be used as identification for classes (id of class-type)</li>
+<li>class functions are generally stateless and used as helper functions ( helper pattern)</li>
+<li>static variable ( local to function or class ) is thread-safe</li>
+</ul>
+<blockquote>
+<p>if you create a cpp file global (defined in cpp file out of anything); it's not implicitly static but it's external so other translation units can access it via extern keyword</p>
+</blockquote>
+<p>let's use it as identity of a class by implementing something like std::any !</p>
+<pre><code class="language-c++">
+struct variant {
+private:
+    struct base {
+        virtual ~base() = default;
+    };
+
+    template &lt;class T&gt;
+    struct data: base {
+        constexpr data(T value): value_(std::forward&lt;T&gt;(value)) {}
+
+        static inline int id = 0;
+
+        constexpr operator T() const noexcept {
+            return value_;
+        }
+
+    private:
+        T value_;
+    };
+
+public:
+    template &lt;class T&gt;
+    constexpr variant(T value): data_{new data&lt;T&gt;(std::forward&lt;T&gt;(value))} {
+        id_ = reinterpret_cast&lt;uintptr_t&gt;((void*)(&amp;data&lt;T&gt;::id));
+    }
+
+    ~variant() {
+        delete data_;
+    }
+
+    base* data_;
+    uintptr_t id_;
+
+    template &lt;class T&gt;
+    constexpr operator T() const {
+        if(to_id(&amp;data&lt;T&gt;::id) != id_)
+            throw std::invalid_argument{"not valid type"};
+
+        return (*static_cast&lt;data&lt;T&gt;*&gt;(data_));
+    }
+
+private:
+    constexpr uintptr_t to_id(void* addr) const {
+        return reinterpret_cast&lt;uintptr_t&gt;(addr);
+    }
+};
+
+int main() {
+    variant v = 10;
+
+    int i = v;
+
+    assert(i == 10);
+
+    // float f = v; =&gt; crashes
+}
+
+</code></pre>
+<p>using static in template functions with constexpr to set that type's unique features as const</p>
+<pre><code class="language-c++">
+template &lt;class T, T val&gt;
+struct constant {
+    using type = T;
+
+    static constexpr auto value = val;
+
+    constexpr operator T() const noexcept { return value; }
+};
+
+namespace {
+template &lt;class T, T val&gt;
+constexpr auto constant_v = constant&lt;T, val&gt;::value;
+}
+
+int main(){
+    // constant
+    constexpr auto i1 = constant&lt;int, 1&gt;{};
+    // int
+    constexpr auto i10 = constant_v&lt;int, 10&gt;;
+
+    std::cout &lt;&lt; typeid(i1).name() &lt;&lt; "\n" &lt;&lt; typeid(i10).name() &lt;&lt; std::endl;
+
+    decltype(i1)::type i20 = constant_v&lt;int, 20&gt;;
+}
+
+
+</code></pre>
+<pre><code class="language-c++">
+// global_variable.cpp
+#include &lt;vector&gt;
+
+std::vector&lt;int&gt; globalVector; // Global variable with external linkage
+static std::vector&lt;int&gt; staticVector; // Global variable with internal linkage
+
+
+
+// main.cpp
+#include &lt;vector&gt;
+
+extern std::vector&lt;int&gt; globalVector; // Accessing the global variable from another file
+// extern std::vector&lt;int&gt; staticVector; // This would cause a linker error
+
+int main() {
+    globalVector.push_back(1);
+    // staticVector.push_back(1); // This is not accessible here
+    return 0;
+}
+
+</code></pre>
+<p>Global Variable (External Linkage)</p>
+<blockquote>
+<p>When you define a global variable (without static), it has external linkage and the following characteristics:</p>
+</blockquote>
+<ul>
+<li>Lifetime: The variable is created when the program starts and destroyed when the program ends.</li>
+<li>Scope: It is accessible from any translation unit (i.e., any .cpp file) that declares it using the extern keyword.</li>
+</ul>
+<p>Static Global Variable (Internal Linkage)</p>
+<blockquote>
+<p>When you define a global variable with the static keyword, it has internal linkage and the following characteristics:</p>
+</blockquote>
+<ul>
+<li>Lifetime: The variable is created when the program starts and destroyed when the program ends, just like a global variable.</li>
+<li>Scope: It is only accessible within the translation unit where it is defined. Other translation units cannot access it.</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="using_atomic_flag.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="use_semaphore_to_sync.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="using_atomic_flag.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="use_semaphore_to_sync.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

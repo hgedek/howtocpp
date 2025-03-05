@@ -170,7 +170,7 @@
     }
 };
 
-// or 
+// or
 // foo.cpp
 
 void foo() {
@@ -197,6 +197,25 @@ void bar() {
 <blockquote>
 <p>static has internal linkage so it's only visible in translation unit
 other translation units cannot access internal linkage symbols</p>
+</blockquote>
+<blockquote>
+<p>Global Variable (External Linkage)</p>
+</blockquote>
+<p>When you define a global variable (without static), it has external linkage and the following characteristics:</p>
+<ul>
+<li>Lifetime: The variable is created when the program starts and destroyed when the program ends.</li>
+<li>Scope: It is accessible from any translation unit (i.e., any .cpp file) that declares it using the extern keyword.</li>
+</ul>
+<blockquote>
+<p>Static Global Variable (Internal Linkage)</p>
+</blockquote>
+<p>When you define a global variable with the static keyword, it has internal linkage and the following characteristics:</p>
+<ul>
+<li>Lifetime: The variable is created when the program starts and destroyed when the program ends, just like a global variable.</li>
+<li>Scope: It is only accessible within the translation unit where it is defined. Other translation units cannot access it.</li>
+</ul>
+<blockquote>
+<p>there is not implicitly static state but all is implicitly external so if you want to hide something in tu, then use static with it</p>
 </blockquote>
 
                     </main>

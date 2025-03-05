@@ -1,0 +1,350 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>use smart pointers - How-to C++</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">How-to C++</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="use-smart-pointers"><a class="header" href="#use-smart-pointers">use smart pointers</a></h1>
+<p>firstly; they are here to manage memory better. we have 3 different std smart pointers. they are created according to ownership models.</p>
+<ul>
+<li>
+<p>unique_ptr: single ownership. sole owner the memory - not shared.</p>
+<ul>
+<li>can be moved</li>
+<li>scope based so it automatically release memory after leaving the scope</li>
+</ul>
+</li>
+<li>
+<p>shared_ptr: shared ownership. one memory but more owners - counting based. when count is 0 then memory is released.</p>
+<ul>
+<li>reference counting: whenever it's 0 then memory is released.</li>
+</ul>
+</li>
+<li>
+<p>weak_ptr: not owner but just user - doesn't care about owning but if possible it tries to use it via shared_ptr.</p>
+<ul>
+<li>implementing cyclic data structures with shared_ptr : one owner + one user</li>
+</ul>
+</li>
+</ul>
+<p>simple examples:</p>
+<pre><code class="language-c++">
+#include &lt;iostream&gt;
+#include &lt;memory&gt;
+
+int main() {
+    std::unique_ptr&lt;int&gt; ptr(new int(42));
+    std::cout &lt;&lt; *ptr &lt;&lt; std::endl; // Output: 42
+
+    // Move ownership
+    std::unique_ptr&lt;int&gt; ptr2 = std::move(ptr);
+    if (ptr2) {
+        std::cout &lt;&lt; *ptr2 &lt;&lt; std::endl; // Output: 42
+    }
+
+    // ptr is now null
+    if (!ptr) {
+        std::cout &lt;&lt; "ptr is now null" &lt;&lt; std::endl;
+    }
+
+    return 0;
+}
+
+</code></pre>
+<pre><code class="language-c++">
+#include &lt;iostream&gt;
+#include &lt;memory&gt;
+
+int main() {
+    std::shared_ptr&lt;int&gt; ptr1(new int(10));
+    std::shared_ptr&lt;int&gt; ptr2 = ptr1; // Shared ownership
+
+    std::cout &lt;&lt; "ptr1 count: " &lt;&lt; ptr1.use_count() &lt;&lt; std::endl; // Output: ptr1 count: 2
+    std::cout &lt;&lt; "ptr2 count: " &lt;&lt; ptr2.use_count() &lt;&lt; std::endl; // Output: ptr2 count: 2
+
+    return 0;
+}
+
+</code></pre>
+<pre><code class="language-c++">
+#include &lt;iostream&gt;
+#include &lt;memory&gt;
+
+int main() {
+    std::shared_ptr&lt;int&gt; sharedPtr(new int(5));
+    std::weak_ptr&lt;int&gt; weakPtr = sharedPtr;
+
+    if (auto lockedPtr = weakPtr.lock()) {
+        std::cout &lt;&lt; "Value: " &lt;&lt; *lockedPtr &lt;&lt; std::endl; // Output: Value: 5
+    }
+
+    sharedPtr.reset(); // Release ownership
+
+    if (weakPtr.lock()) {
+        std::cout &lt;&lt; "This won't be printed." &lt;&lt; std::endl;
+    } else {
+        std::cout &lt;&lt; "Object no longer exists." &lt;&lt; std::endl; // Object no longer exists.
+    }
+
+    return 0;
+}
+
+</code></pre>
+<blockquote>
+<p>cyclic dependency problem solution with shared_ptr and weak_ptr</p>
+</blockquote>
+<pre><code class="language-c++">
+#include &lt;iostream&gt;
+#include &lt;memory&gt;
+
+class B; // Forward declaration
+
+class A {
+public:
+    std::shared_ptr&lt;B&gt; b_ptr;
+
+    ~A() {
+        std::cout &lt;&lt; "A destroyed" &lt;&lt; std::endl;
+    }
+};
+
+class B {
+public:
+    std::weak_ptr&lt;A&gt; a_ptr; // Changed to weak_ptr
+
+    ~B() {
+        std::cout &lt;&lt; "B destroyed" &lt;&lt; std::endl;
+    }
+};
+
+int main() {
+    {
+        std::shared_ptr&lt;A&gt; a = std::make_shared&lt;A&gt;();
+        std::shared_ptr&lt;B&gt; b = std::make_shared&lt;B&gt;();
+
+        a-&gt;b_ptr = b;
+        b-&gt;a_ptr = a; // Weak ptr does not increment the ref count.
+    } // a and b go out of scope here
+
+    std::cout &lt;&lt; "Program ends" &lt;&lt; std::endl;
+
+    return 0;
+}
+
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="err_codes.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="padding_and_alignment.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="err_codes.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="padding_and_alignment.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>design builder pattern - How-to C++</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">How-to C++</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="design-builder-pattern"><a class="header" href="#design-builder-pattern">design builder pattern</a></h1>
+<p>there are multiple ways of implementing builder pattern. inheritance and own builder type.</p>
+<blockquote>
+<p>all pattern examples are ai generated solutions</p>
+</blockquote>
+<p>using rvalue functions...</p>
+<pre><code class="language-c++">
+#include &lt;iostream&gt;
+#include &lt;memory&gt;
+#include &lt;string&gt;
+#include &lt;utility&gt;
+#include &lt;vector&gt;
+
+class Product {
+   public:
+    class Builder;  // Forward declaration
+
+    void display() const {
+        std::cout &lt;&lt; "Product Details:\n";
+        std::cout &lt;&lt; "Name: " &lt;&lt; name &lt;&lt; "\n";
+        std::cout &lt;&lt; "Price: $" &lt;&lt; price &lt;&lt; "\n";
+
+        std::cout &lt;&lt; "Features:\n";
+        for (const auto&amp; feature : features) {
+            std::cout &lt;&lt; "- " &lt;&lt; feature &lt;&lt; "\n";
+        }
+
+        std::cout &lt;&lt; "Variants:\n";
+        for (const auto&amp; variant : variants) {
+            std::cout &lt;&lt; "- " &lt;&lt; variant &lt;&lt; "\n";
+        }
+    }
+
+   private:
+    friend class Builder;
+    std::string name;
+    double price = 0.0;
+    std::vector&lt;std::string&gt; features;
+    std::vector&lt;std::string&gt; variants;
+};
+
+// Rvalue Reference Builder Implementation
+class Product::Builder {
+   public:
+    // Rvalue reference methods for efficient move semantics
+    Builder&amp;&amp; name(std::string&amp;&amp; productName) &amp;&amp; {
+        product.name = std::move(productName);
+        return std::move(*this);
+    }
+
+    Builder&amp;&amp; price(double productPrice) &amp;&amp; {
+        product.price = productPrice;
+        return std::move(*this);
+    }
+
+    Builder&amp;&amp; addFeature(std::string&amp;&amp; feature) &amp;&amp; {
+        product.features.push_back(std::move(feature));
+        return std::move(*this);
+    }
+
+    Builder&amp;&amp; addVariant(std::string&amp;&amp; variant) &amp;&amp; {
+        product.variants.push_back(std::move(variant));
+        return std::move(*this);
+    }
+
+    // Rvalue reference build method
+    Product build() &amp;&amp; { return std::move(product); }
+
+   private:
+    Product product;
+};
+
+int main() {
+    // Rvalue Reference Builder Usage
+    auto product = Product::Builder()
+                       .name("SmartPhone")
+                       .price(599.99)
+                       .addFeature("5G Support")
+                       .addFeature("Quad Camera")
+                       .addVariant("Black")
+                       .addVariant("White")
+                       .build();
+
+    product.display();
+}
+
+```
+
+
+```c++
+
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;memory&gt;
+#include &lt;vector&gt;
+#include &lt;optional&gt;
+
+class Pizza {
+public:
+    class Builder;  // Forward declaration
+
+    void display() const {
+        std::cout &lt;&lt; "Pizza Details:\n";
+        std::cout &lt;&lt; "Size: " &lt;&lt; size &lt;&lt; "\n";
+        std::cout &lt;&lt; "Cheese: " &lt;&lt; (hasCheese ? "Yes" : "No") &lt;&lt; "\n";
+        std::cout &lt;&lt; "Toppings:\n";
+        for (const auto&amp; topping : toppings) {
+            std::cout &lt;&lt; "- " &lt;&lt; topping &lt;&lt; "\n";
+        }
+    }
+
+private:
+    friend class Builder;
+    std::string size = "Medium";
+    bool hasCheese = false;
+    std::vector&lt;std::string&gt; toppings;
+};
+
+// Builder nested within Pizza class
+class Pizza::Builder {
+public:
+    Builder&amp; setSize(const std::string&amp; newSize) {
+        pizza.size = newSize;
+        return *this;
+    }
+
+    Builder&amp; addCheese() {
+        pizza.hasCheese = true;
+        return *this;
+    }
+
+    Builder&amp; addTopping(const std::string&amp; topping) {
+        pizza.toppings.push_back(topping);
+        return *this;
+    }
+
+    Pizza build() {
+        return std::move(pizza);
+    }
+
+private:
+    Pizza pizza;
+};
+
+// Fluent Builder with Inheritance
+class Burger {
+public:
+    class Builder;
+    virtual ~Burger() = default;
+
+    virtual void display() const {
+        std::cout &lt;&lt; "Burger Details:\n";
+        std::cout &lt;&lt; "Size: " &lt;&lt; size &lt;&lt; "\n";
+        std::cout &lt;&lt; "Type: " &lt;&lt; type &lt;&lt; "\n";
+        std::cout &lt;&lt; "Extras: " &lt;&lt; extras &lt;&lt; "\n";
+    }
+
+protected:
+    std::string size = "Medium";
+    std::string type = "Classic";
+    std::string extras;
+};
+
+class Burger::Builder {
+public:
+    virtual Builder&amp; setSize(const std::string&amp; newSize) {
+        burger.size = newSize;
+        return *this;
+    }
+
+    virtual Builder&amp; setType(const std::string&amp; newType) {
+        burger.type = newType;
+        return *this;
+    }
+
+    virtual Builder&amp; addExtras(const std::string&amp; newExtras) {
+        burger.extras = newExtras;
+        return *this;
+    }
+
+    virtual std::unique_ptr&lt;Burger&gt; build() {
+        return std::make_unique&lt;Burger&gt;(std::move(burger));
+    }
+
+protected:
+    Burger burger;
+};
+
+// Advanced Builder with Director
+class House {
+public:
+    class Builder;
+
+    void display() const {
+        std::cout &lt;&lt; "House Details:\n";
+        std::cout &lt;&lt; "Walls: " &lt;&lt; wallType &lt;&lt; "\n";
+        std::cout &lt;&lt; "Doors: " &lt;&lt; doorType &lt;&lt; "\n";
+        std::cout &lt;&lt; "Windows: " &lt;&lt; windowType &lt;&lt; "\n";
+        std::cout &lt;&lt; "Garage: " &lt;&lt; (hasGarage ? "Yes" : "No") &lt;&lt; "\n";
+    }
+
+private:
+    friend class Builder;
+    std::string wallType = "Brick";
+    std::string doorType = "Wood";
+    std::string windowType = "Glass";
+    bool hasGarage = false;
+};
+
+class House::Builder {
+public:
+    Builder&amp; setWallType(const std::string&amp; type) {
+        house.wallType = type;
+        return *this;
+    }
+
+    Builder&amp; setDoorType(const std::string&amp; type) {
+        house.doorType = type;
+        return *this;
+    }
+
+    Builder&amp; setWindowType(const std::string&amp; type) {
+        house.windowType = type;
+        return *this;
+    }
+
+    Builder&amp; addGarage() {
+        house.hasGarage = true;
+        return *this;
+    }
+
+    House build() {
+        return std::move(house);
+    }
+
+private:
+    House house;
+};
+
+// House Director
+class HouseDirector {
+public:
+    static House buildLuxuryHouse(House::Builder&amp; builder) {
+        return builder
+            .setWallType("Marble")
+            .setDoorType("Mahogany")
+            .setWindowType("Double-Glazed")
+            .addGarage()
+            .build();
+    }
+
+    static House buildSimpleHouse(House::Builder&amp; builder) {
+        return builder
+            .setWallType("Concrete")
+            .setDoorType("Steel")
+            .build();
+    }
+};
+
+// Modern C++20 Concept-Based Builder
+template&lt;typename T&gt;
+concept BuilderConcept = requires(T builder) {
+    { builder.build() } -&gt; std::convertible_to&lt;House&gt;;
+};
+
+int main() {
+    // Traditional Builder Usage
+    auto pizza = Pizza::Builder()
+        .setSize("Large")
+        .addCheese()
+        .addTopping("Pepperoni")
+        .addTopping("Mushrooms")
+        .build();
+    pizza.display();
+
+    // Fluent Builder with Inheritance
+    auto burger = Burger::Builder()
+        .setSize("Large")
+        .setType("Veggie")
+        .addExtras("Extra Sauce")
+        .build();
+    burger-&gt;display();
+
+    // House Builder with Director
+    House::Builder houseBuilder;
+    auto luxuryHouse = HouseDirector::buildLuxuryHouse(houseBuilder);
+    luxuryHouse.display();
+
+    auto simpleHouse = HouseDirector::buildSimpleHouse(houseBuilder);
+    simpleHouse.display();
+
+    return 0;
+}
+
+</code></pre>
+<h2 id="using-inheritance"><a class="header" href="#using-inheritance">Using inheritance</a></h2>
+<pre><code class="language-c++">
+class Product {
+public:
+    void setPartA(const std::string&amp; partA) { partA_ = partA; }
+    void setPartB(const std::string&amp; partB) { partB_ = partB; }
+    void setPartC(const std::string&amp; partC) { partC_ = partC; }
+
+    void show() const {
+        std::cout &lt;&lt; "PartA: " &lt;&lt; partA_ &lt;&lt; "\n"
+                  &lt;&lt; "PartB: " &lt;&lt; partB_ &lt;&lt; "\n"
+                  &lt;&lt; "PartC: " &lt;&lt; partC_ &lt;&lt; "\n";
+    }
+
+private:
+    std::string partA_;
+    std::string partB_;
+    std::string partC_;
+};
+
+
+class Builder {
+public:
+    virtual ~Builder() = default;
+    virtual void buildPartA() = 0;
+    virtual void buildPartB() = 0;
+    virtual void buildPartC() = 0;
+    virtual Product* getResult() = 0;
+};
+
+
+class ConcreteBuilder : public Builder {
+public:
+    ConcreteBuilder() { product_ = new Product(); }
+    ~ConcreteBuilder() { delete product_; }
+
+    void buildPartA() override { product_-&gt;setPartA("PartA1"); }
+    void buildPartB() override { product_-&gt;setPartB("PartB1"); }
+    void buildPartC() override { product_-&gt;setPartC("PartC1"); }
+
+    Product* getResult() override {
+        Product* result = product_;
+        product_ = new Product(); // Reset for next build
+        return result;
+    }
+
+private:
+    Product* product_;
+};
+
+
+class Director {
+public:
+    void setBuilder(Builder* builder) { builder_ = builder; }
+
+    void construct() {
+        builder_-&gt;buildPartA();
+        builder_-&gt;buildPartB();
+        builder_-&gt;buildPartC();
+    }
+
+private:
+    Builder* builder_;
+};
+
+int main() {
+    Director director;
+    ConcreteBuilder builder;
+
+    director.setBuilder(&amp;builder);
+    director.construct();
+
+    Product* product = builder.getResult();
+    product-&gt;show();
+
+    delete product;
+    return 0;
+}
+
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="vopts_vargs_togeter.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="factory_method_pattern.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="vopts_vargs_togeter.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="factory_method_pattern.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

@@ -153,6 +153,118 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="use-nested-classes"><a class="header" href="#use-nested-classes">use nested classes</a></h1>
+<p>c++ allows nested classes, namespaces... when designing your code; you should think about encapsulation and scopes. Putting everything into header files, exporting data, allowing other classes to see classes which are not even related with them... these are all wrong.</p>
+<p>you should always start to your design with hiding - hide your classes internals from others. If they need to access them then export them.</p>
+<pre><code class="language-c++">
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;stdexcept&gt;
+
+class SecureDatabase {
+private:
+    // Private nested class for internal record management
+    class Record {
+    private:
+        std::string username;
+        std::string passwordHash;
+        bool isActive;
+
+        // Private hash method - internal to Record
+        std::string hashPassword(const std::string&amp; password) {
+            // Simplified hash simulation
+            size_t hash = 0;
+            for (char c : password) {
+                hash = hash * 31 + c;
+            }
+            return std::to_string(hash);
+        }
+
+    public:
+        Record(const std::string&amp; user, const std::string&amp; password)
+            : username(user),
+              passwordHash(hashPassword(password)),
+              isActive(true) {}
+
+        bool verifyPassword(const std::string&amp; inputPassword) const {
+            return passwordHash == hashPassword(inputPassword);
+        }
+
+        std::string getUsername() const { return username; }
+        bool getActiveStatus() const { return isActive; }
+        void setActiveStatus(bool status) { isActive = status; }
+    };
+
+    // Vector to store records - completely hidden from outside world
+    std::vector&lt;Record&gt; records;
+
+public:
+    // Public methods to interact with records
+    void addUser(const std::string&amp; username, const std::string&amp; password) {
+        // Check if user already exists
+        for (const auto&amp; record : records) {
+            if (record.getUsername() == username) {
+                throw std::runtime_error("User already exists");
+            }
+        }
+        records.emplace_back(username, password);
+    }
+
+    bool authenticateUser(const std::string&amp; username, const std::string&amp; password) {
+        for (const auto&amp; record : records) {
+            if (record.getUsername() == username &amp;&amp;
+                record.verifyPassword(password) &amp;&amp;
+                record.getActiveStatus()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void deactivateUser(const std::string&amp; username) {
+        for (auto&amp; record : records) {
+            if (record.getUsername() == username) {
+                record.setActiveStatus(false);
+                return;
+            }
+        }
+        throw std::runtime_error("User not found");
+    }
+};
+
+int main() {
+    SecureDatabase database;
+
+    try {
+        // Add users
+        database.addUser("alice", "securepass123");
+        database.addUser("bob", "password456");
+
+        // Authentication attempts
+        std::cout &lt;&lt; "Alice authentication: "
+                  &lt;&lt; (database.authenticateUser("alice", "securepass123") ? "Success" : "Failed")
+                  &lt;&lt; std::endl;
+
+        std::cout &lt;&lt; "Bob authentication: "
+                  &lt;&lt; (database.authenticateUser("bob", "wrongpassword") ? "Success" : "Failed")
+                  &lt;&lt; std::endl;
+
+        // Deactivate user
+        database.deactivateUser("bob");
+
+        // Authentication after deactivation
+        std::cout &lt;&lt; "Bob authentication after deactivation: "
+                  &lt;&lt; (database.authenticateUser("bob", "password456") ? "Success" : "Failed")
+                  &lt;&lt; std::endl;
+    }
+    catch (const std::exception&amp; e) {
+        std::cerr &lt;&lt; "Error: " &lt;&lt; e.what() &lt;&lt; std::endl;
+    }
+
+    return 0;
+}
+
+</code></pre>
 
                     </main>
 
